@@ -1,0 +1,20 @@
+# Frontend (SSR) on the backend's network. Start the backend first: `docker compose up` in ../../PycharmProjects/agregator-backend
+services:
+  front:
+    build:
+      context: .
+      args:
+        VITE_API_URL: http://localhost:8002 # browser -> API, baked in at build
+    ports:
+      - "127.0.0.1:5173:5173" # the origin the API allows (CORS_ALLOWED_ORIGINS)
+    environment:
+      # server render -> API inside the network; the browser uses VITE_API_URL from the build arg above
+      API_INTERNAL_URL: http://app:8000
+    networks:
+      - backend
+    restart: unless-stopped
+
+networks:
+  backend:
+    external: true
+    name: agregator-backend_default # compose default network of the agregator-backend project
