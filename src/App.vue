@@ -48,10 +48,14 @@ import { NAV, SITE } from '@/site'
     <footer
       class="border-t border-zinc-200 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800"
     >
-      Stories are written by a language model from facts checked against the linked sources ·
-      <RouterLink to="/about" class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
-        >How we make the news</RouterLink
-      >
+      <p>Stories are written by a language model from facts checked against the linked sources</p>
+      <nav class="mt-2 flex justify-center gap-4" aria-label="Site">
+        <RouterLink to="/about" class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
+          >About</RouterLink
+        >
+        <!-- served next to the app, not one of its routes -->
+        <a href="/rss.xml" class="underline hover:text-zinc-700 dark:hover:text-zinc-300">RSS</a>
+      </nav>
     </footer>
   </div>
 </template>
