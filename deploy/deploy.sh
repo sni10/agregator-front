@@ -19,6 +19,6 @@ cd "$1"
 if grep -q '^FRONT_TAG=' .env; then sed -i "s/^FRONT_TAG=.*/FRONT_TAG=$2/" .env; else echo "FRONT_TAG=$2" >> .env; fi
 compose() { docker compose -f compose.prod.yaml --profile front "$@"; }  # front is in a profile: off until FRONT_TAG is set
 compose pull --quiet front
-compose up -d front
+compose up -d --no-deps front  # --no-deps: .env changed (FRONT_TAG), and app reads it too: do not restart the backend
 compose ps --format '{{.Service}}\t{{.Status}}\t{{.Image}}'
 REMOTE
