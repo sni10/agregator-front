@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { ref } from 'vue'
+import { errorMessage, getNotifications, setNotifications, type Notifications } from '@/api'
 
-// How a reader gets news of their favorites: the gear on the Favorites page.
-// MOCK: nothing is delivered and nothing reaches the server yet; the switches live in this browser only.
+// How a reader gets news of their favorites: the gear on the Favorites page. Stored on the server
+// (/me/notifications); the digest and push senders will read it. Telegram is not there yet.
 const CHANNELS = [
   {
-    key: 'email',
+    key: 'emailDigest',
     title: 'Weekly email digest',
     text: 'Once a week: what happened next in your favorite stories, plus the top news of their topics.',
     icon: '✉',
@@ -24,35 +25,37 @@ const CHANNELS = [
     soon: true,
   },
 ] as const
-type Key = (typeof CHANNELS)[number]['key']
-
-const STORE = 'notify-mock'
-function load(): Record<Key, boolean> {
-  try {
-    return {
-      email: false,
-      push: false,
-      telegram: false,
-      ...JSON.parse(localStorage.getItem(STORE) ?? '{}'),
-    }
-  } catch {
-    return { email: false, push: false, telegram: false }
-  }
-}
 
 const dialog = ref<HTMLDialogElement>()
-// read after mount: the server render knows nothing of this browser
-const on = ref<Record<Key, boolean>>({ email: false, push: false, telegram: false })
-onMounted(() => (on.value = load()))
+const on = ref<Notifications | null>(null) // null until loaded: switches disabled
+const error = ref('')
 
-function toggle(key: Key) {
-  on.value[key] = !on.value[key]
+// loaded when opened: the page itself doesn't need it
+async function open() {
+  dialog.value?.showModal()
+  error.value = ''
   try {
-    localStorage.setItem(STORE, JSON.stringify(on.value))
-  } catch {
-    // private mode: the switch still works until reload
+    on.value = await getNotifications()
+  } catch (e) {
+    error.value = errorMessage(e)
   }
 }
+
+// at once on screen; back if the server says no
+async function toggle(key: keyof Notifications) {
+  if (!on.value) return
+  const value = !on.value[key]
+  on.value[key] = value
+  error.value = ''
+  try {
+    await setNotifications({ [key]: value }) // the answer is not applied: a quicker second click may be newer
+  } catch (e) {
+    if (on.value) on.value[key] = !value
+    error.value = errorMessage(e)
+  }
+}
+
+const isOn = (key: string) => !!on.value?.[key as keyof Notifications]
 </script>
 
 <template>
@@ -61,7 +64,7 @@ function toggle(key: Key) {
     class="flex size-9 items-center justify-center rounded-full text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-800 dark:hover:text-zinc-100"
     aria-label="Updates on your favorites"
     title="Updates on your favorites"
-    @click="dialog?.showModal()"
+    @click="open"
   >
     <svg viewBox="0 0 24 24" class="size-5" fill="none" stroke="currentColor" stroke-width="2">
       <path
@@ -116,21 +119,22 @@ function toggle(key: Key) {
         <button
           type="button"
           role="switch"
-          :aria-checked="on[c.key]"
+          :aria-checked="isOn(c.key)"
           :aria-labelledby="`notify-${c.key}`"
-          :disabled="'soon' in c"
+          :disabled="'soon' in c || !on"
           class="relative mt-1 h-6 w-11 shrink-0 rounded-full transition disabled:cursor-not-allowed"
-          :class="on[c.key] ? 'bg-violet-600' : 'bg-zinc-300 dark:bg-zinc-700'"
-          @click="toggle(c.key)"
+          :class="isOn(c.key) ? 'bg-violet-600' : 'bg-zinc-300 dark:bg-zinc-700'"
+          @click="c.key !== 'telegram' && toggle(c.key)"
         >
           <span
             class="absolute top-0.5 left-0.5 size-5 rounded-full bg-white shadow transition"
-            :class="on[c.key] && 'translate-x-5'"
+            :class="isOn(c.key) && 'translate-x-5'"
           />
         </button>
       </li>
     </ul>
 
+    <p v-if="error" class="alert alert-error mt-4" role="alert">{{ error }}</p>
     <button type="button" class="btn btn-primary mt-6 w-full" @click="dialog?.close()">Done</button>
   </dialog>
 </template>

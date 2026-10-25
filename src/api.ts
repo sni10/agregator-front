@@ -292,6 +292,15 @@ export const getFavorites = (page: number) =>
 
 export const getFavoriteSlugs = () => request<string[]>('GET', '/me/favorites/slugs')
 
+// how the reader hears about follow-ups of their favorites; all off at first. PATCH changes only what is sent.
+export interface Notifications {
+  emailDigest: boolean
+  push: boolean
+}
+export const getNotifications = () => request<Notifications>('GET', '/me/notifications')
+export const setNotifications = (change: Partial<Notifications>) =>
+  request<Notifications>('PATCH', '/me/notifications', change)
+
 // The contact form: the backend emails it to the editors (the address never reaches the browser).
 // 400 {field: [msg]}, {captcha} = the token didn't pass (get a new one); 429 = 5 an hour per IP
 export type ContactTopic = 'question' | 'correction' | 'copyright' | 'other'
