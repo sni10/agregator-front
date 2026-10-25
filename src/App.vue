@@ -48,8 +48,7 @@ import { NAV, SITE } from '@/site'
     <footer
       class="border-t border-zinc-200 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800"
     >
-      <p>Stories are written by a language model from facts checked against the linked sources</p>
-      <nav class="mt-2 flex justify-center gap-4" aria-label="Site">
+      <nav class="flex justify-center gap-4" aria-label="Site">
         <RouterLink to="/about" class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
           >About</RouterLink
         >
