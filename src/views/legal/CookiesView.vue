@@ -19,7 +19,10 @@ usePageMeta(() => ({
     </p>
 
     <h2>Strictly necessary</h2>
-    <p>Always on: without it we couldn't remember your choice. No consent is needed for it.</p>
+    <p>
+      Always on: the site needs them to remember your choice and keep you signed in. No consent is
+      needed for them.
+    </p>
     <table>
       <thead>
         <tr>
@@ -35,6 +38,18 @@ usePageMeta(() => ({
           <td>Local storage</td>
           <td>Remembers whether you accepted or rejected analytics cookies</td>
           <td>Until you clear your browser data</td>
+        </tr>
+        <tr>
+          <td><code>refresh</code></td>
+          <td>Local storage</td>
+          <td>Keeps you signed in to your account</td>
+          <td>Until you sign out, at most 7 days without a visit</td>
+        </tr>
+        <tr>
+          <td><code>pending-favorite</code></td>
+          <td>Local storage</td>
+          <td>The story you hearted before signing in, added once you sign in</td>
+          <td>Until you sign in</td>
         </tr>
       </tbody>
     </table>

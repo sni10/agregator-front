@@ -23,6 +23,44 @@ export function createRouter() {
       },
       { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue') },
       { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
+      // accounts: all noindex, filled in the browser only
+      ...(['login', 'register'] as const).map((mode) => ({
+        path: `/${mode}`,
+        name: mode,
+        component: () => import('@/views/account/AuthView.vue'),
+        props: { mode },
+      })),
+      {
+        path: '/forgot-password',
+        name: 'forgot-password',
+        component: () => import('@/views/account/ResetView.vue'),
+      },
+      {
+        path: '/reset-password',
+        name: 'reset-password',
+        component: () => import('@/views/account/ResetView.vue'),
+      },
+      {
+        path: '/confirm-email',
+        name: 'confirm-email',
+        component: () => import('@/views/account/ConfirmView.vue'),
+      },
+      {
+        path: '/confirm-email-change',
+        name: 'confirm-email-change',
+        component: () => import('@/views/account/ConfirmView.vue'),
+        props: { change: true },
+      },
+      {
+        path: '/account',
+        name: 'account',
+        component: () => import('@/views/account/AccountView.vue'),
+      },
+      {
+        path: '/favorites',
+        name: 'favorites',
+        component: () => import('@/views/account/FavoritesView.vue'),
+      },
       {
         path: '/privacy',
         name: 'privacy',

@@ -2,6 +2,8 @@
 import { NAV, SITE } from '@/site'
 import { consentOpen } from '@/consent'
 import CookieBanner from '@/components/CookieBanner.vue'
+import AuthDialog from '@/components/AuthDialog.vue'
+import UserMenu from '@/components/UserMenu.vue'
 
 const LEGAL = [
   { to: '/about', label: 'About' },
@@ -47,6 +49,7 @@ const LEGAL = [
             class="w-44 rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm outline-none focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-900"
           />
         </form>
+        <UserMenu class="max-sm:ml-auto" />
       </div>
     </header>
 
@@ -79,5 +82,6 @@ const LEGAL = [
       <p class="mt-3">© {{ new Date().getFullYear() }} {{ SITE.name }}</p>
     </footer>
     <CookieBanner />
+    <AuthDialog />
   </div>
 </template>

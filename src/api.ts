@@ -61,10 +61,28 @@ export const PAGE_SIZE = 20 // the backend's FeedPagination
 
 export class ApiError extends Error {
   status: number
-  constructor(status: number, message: string) {
+  data: Record<string, unknown> // response body: field errors {field: [msg]}, {code}, …
+  constructor(status: number, message: string, data: Record<string, unknown> = {}) {
     super(message)
     this.status = status
+    this.data = data
   }
+}
+
+// 400 field errors -> {field: first message}
+export function fieldErrors(e: unknown): Record<string, string> {
+  if (!(e instanceof ApiError) || e.status !== 400) return {}
+  return Object.fromEntries(
+    Object.entries(e.data).map(([k, v]) => [k, String(Array.isArray(v) ? v[0] : v)]),
+  )
+}
+
+// One line for the reader, for any failure that isn't a form field error
+export function errorMessage(e: unknown) {
+  if (!(e instanceof ApiError)) return 'Something went wrong. Try again.'
+  if (e.status === 0) return 'No connection. Check your internet and try again.'
+  if (e.status === 429) return 'Too many attempts. Please try again later.'
+  return `Something went wrong (${e.status}). Try again in a minute.`
 }
 
 // Browser: VITE_API_URL (baked in at build). Server render in Docker: API_INTERNAL_URL at runtime,
@@ -75,6 +93,8 @@ const API_URL = (
     : import.meta.env.VITE_API_URL
 ) as string | undefined
 
+// Public reads: never with a token, so the server render and the micro-cache see the same pages for
+// everybody (and a dead token can't turn them into 401s).
 async function get<T>(path: string, query: Record<string, string | number | undefined> = {}) {
   const params = new URLSearchParams()
   for (const [key, value] of Object.entries(query)) if (value) params.set(key, String(value))
@@ -94,3 +114,146 @@ export const getStory = (slug: string) =>
 
 export const search = (q: string, page: number) =>
   get<Page<Story>>('/search', { q, page: page > 1 ? page : undefined })
+
+// --- accounts (browser only: the server render never has a token) ---
+
+export interface Me {
+  id: string
+  email: string
+  dateJoined: string
+  isAdmin: boolean // admins can't delete their account here (403)
+}
+
+interface Tokens {
+  access: string // JWT, 15 minutes
+  refresh: string // 7 days, single-use: every refresh returns a new pair
+}
+
+// Date of the current Terms of Use (shown on /terms). Change it together with the backend when the text
+// changes: the backend stores which version each reader accepted.
+export const TERMS_VERSION = '2026-10-25'
+
+// Session: access token in memory, refresh token in localStorage.
+const REFRESH = 'refresh'
+const store = typeof localStorage === 'undefined' ? undefined : localStorage
+let access: string | null = null
+let refreshing: Promise<void> | null = null
+
+export const hasSession = () => !!store?.getItem(REFRESH)
+
+function setTokens(t: Tokens) {
+  access = t.access
+  store?.setItem(REFRESH, t.refresh)
+}
+
+export function clearTokens() {
+  access = null
+  store?.removeItem(REFRESH)
+}
+
+function send(method: string, path: string, body?: unknown) {
+  return fetch(`${API_URL}${path}`, {
+    method,
+    headers: {
+      ...(body !== undefined && { 'Content-Type': 'application/json' }),
+      ...(access && { Authorization: `Bearer ${access}` }),
+    },
+    body: body === undefined ? undefined : JSON.stringify(body),
+  }).catch(() => {
+    throw new ApiError(0, `${method} ${path}: network error`)
+  })
+}
+
+// One refresh at a time: the refresh token is single-use, parallel 401s must share the new pair.
+function refreshTokens() {
+  refreshing ??= (async () => {
+    const refresh = store?.getItem(REFRESH)
+    access = null
+    if (!refresh) return
+    const res = await send('POST', '/auth/refresh', { refresh })
+    if (res.ok) setTokens(await res.json())
+    else if (res.status === 400 || res.status === 401)
+      clearTokens() // dead session -> guest
+    else throw new ApiError(res.status, `POST /auth/refresh: ${res.status}`)
+  })().finally(() => (refreshing = null))
+  return refreshing
+}
+
+async function request<T>(method: string, path: string, body?: unknown): Promise<T> {
+  if (!access && hasSession()) await refreshTokens()
+  const used = access
+  let res = await send(method, path, body)
+  // expired access: refresh (or drop the dead session) and repeat once, the reader notices nothing
+  if (res.status === 401 && used) {
+    if (access === used) await refreshTokens()
+    res = await send(method, path, body)
+  }
+  if (!res.ok) {
+    const data = await res.json().catch(() => ({})) // a proxy may answer with HTML (502…)
+    throw new ApiError(res.status, `${method} ${path}: ${res.status}`, data)
+  }
+  const text = await res.text() // 201/204 may come without a body
+  return (text ? JSON.parse(text) : undefined) as T
+}
+
+const post = <T>(path: string, body: unknown) => request<T>('POST', path, body)
+
+export const getMe = () => request<Me>('GET', '/me')
+
+// 401 = wrong email or password; 403 {code: 'email_not_confirmed'}; 429 = rate limit
+export const login = (email: string, password: string) =>
+  post<Tokens>('/auth/login', { email, password }).then(setTokens)
+
+export const register = (email: string, password: string) =>
+  post<unknown>('/auth/register', {
+    email,
+    password,
+    termsAccepted: true, // the form can't be sent without the checkbox
+    termsVersion: TERMS_VERSION,
+  })
+
+// both always 204: they don't tell whether an account exists
+export const resendConfirmation = (email: string) =>
+  post<void>('/auth/resend-confirmation', { email })
+export const requestPasswordReset = (email: string) => post<void>('/auth/password-reset', { email })
+
+// links from the emails; 400 {token} = bad or expired link. The first two sign the reader in.
+export const confirmEmail = (token: string) =>
+  post<Tokens>('/auth/confirm-email', { token }).then(setTokens)
+export const resetPassword = (token: string, password: string) =>
+  post<Tokens>('/auth/password-reset/confirm', { token, password }).then(setTokens)
+export const confirmEmailChange = (token: string) =>
+  post<{ email?: string }>('/auth/confirm-email-change', { token })
+
+// a confirmation link goes to the new address
+export const changeEmail = (newEmail: string, password: string) =>
+  post<void>('/me/email', { newEmail, password })
+
+// other devices are signed out; this one may get a fresh pair
+export const changePassword = (currentPassword: string, newPassword: string) =>
+  post<Tokens | undefined>('/me/password', { currentPassword, newPassword }).then(
+    (t) => t && setTokens(t),
+  )
+
+export async function logout() {
+  const refresh = store?.getItem(REFRESH)
+  access = null // plain send: request() would spend the refresh token on a refresh first
+  if (refresh) await send('POST', '/auth/logout', { refresh }).catch(() => {})
+  clearTokens()
+}
+
+// for good, with the favorites. 400 {password} = wrong password; 403 = admin account
+export async function deleteAccount(password: string) {
+  await request<void>('DELETE', '/me', { password })
+  clearTokens()
+}
+
+// both idempotent (204)
+export const setFavorite = (slug: string, on: boolean) =>
+  request<void>(on ? 'PUT' : 'DELETE', `/me/favorites/${encodeURIComponent(slug)}`)
+
+// recently added first, paged like /publications
+export const getFavorites = (page: number) =>
+  request<Page<Story>>('GET', `/me/favorites${page > 1 ? `?page=${page}` : ''}`)
+
+export const getFavoriteSlugs = () => request<string[]>('GET', '/me/favorites/slugs')

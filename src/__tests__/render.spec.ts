@@ -176,4 +176,36 @@ describe('server render', () => {
     expect(page.html).toMatch(/href="https:\/\/lwn.net\/a" target="_blank" rel="nofollow noopener"/)
     expect(page.html).toMatch(/href="https:\/\/pixabay.com\/photos\/p-1\/" rel="nofollow noopener"/)
   })
+  it('renders the account pages as empty frames, out of the index', async () => {
+    api({})
+
+    for (const path of [
+      '/login',
+      '/register',
+      '/forgot-password',
+      '/reset-password?token=t',
+      '/confirm-email?token=t',
+      '/confirm-email-change?token=t',
+      '/account',
+      '/favorites',
+    ]) {
+      const page = await render(path, 'https://site.test')
+      expect(page.status).toBe(200)
+      expect(page.head).toContain('<meta name="robots" content="noindex">')
+      expect(page.head).not.toContain('canonical')
+    }
+    // nothing personal and no email links spent on the server
+    expect(vi.mocked(fetch)).not.toHaveBeenCalled()
+  })
+
+  it('renders hearts for a guest and asks the API without a token', async () => {
+    api({ '/publications/php-patches': detail, '/publications': feed })
+
+    const page = await render('/news/php-patches', 'https://site.test')
+
+    expect(page.html).toContain('aria-label="Add to favorites"')
+    expect(page.html).not.toContain('aria-pressed="true"')
+    for (const [, init] of vi.mocked(fetch).mock.calls)
+      expect(JSON.stringify(init ?? {})).not.toContain('Authorization')
+  })
 })

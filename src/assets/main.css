@@ -1,2 +1,39 @@
 /* Tailwind 4, utilities only (the look of mockups/ in the pipeline repo). Dark mode follows the system. */
 @import 'tailwindcss';
+
+/* Forms of the account pages and the sign-in window */
+@layer components {
+  .input {
+    @apply w-full rounded-xl border border-zinc-300 bg-white px-3 py-2 outline-none focus:border-violet-500 dark:border-zinc-700 dark:bg-zinc-900;
+  }
+  .input-label {
+    @apply mb-1 block text-sm font-semibold;
+  }
+  .field-error {
+    @apply mt-1 text-sm text-rose-600 dark:text-rose-400;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full border border-zinc-300 px-5 py-2 text-sm font-semibold transition hover:bg-zinc-100 disabled:opacity-50 dark:border-zinc-700 dark:hover:bg-zinc-800;
+  }
+  .btn-primary {
+    @apply border-transparent bg-zinc-900 text-white hover:bg-zinc-700 dark:bg-white dark:text-zinc-900 dark:hover:bg-zinc-200;
+  }
+  .btn-danger {
+    @apply border-transparent bg-rose-600 text-white hover:bg-rose-700 dark:hover:bg-rose-500;
+  }
+  .alert {
+    @apply rounded-xl px-4 py-3 text-sm;
+  }
+  .alert-error {
+    @apply bg-rose-50 text-rose-800 dark:bg-rose-500/10 dark:text-rose-300;
+  }
+  .alert-ok {
+    @apply bg-emerald-50 text-emerald-800 dark:bg-emerald-500/10 dark:text-emerald-300;
+  }
+  .panel {
+    @apply rounded-2xl border border-zinc-200 bg-white p-6 dark:border-zinc-800 dark:bg-zinc-900;
+  }
+  .link {
+    @apply text-violet-600 underline dark:text-violet-400;
+  }
+}

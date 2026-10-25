@@ -26,8 +26,14 @@ usePageMeta(() => ({
 
     <h2>The short version</h2>
     <ul>
-      <li>{{ SITE.name }} is a news feed. There are no accounts, sign-ups, comments or forms.</li>
-      <li>We don't ask for your name, email or any other details, and we don't sell data.</li>
+      <li>
+        {{ SITE.name }} is a news feed. You can read everything without an account; an account is
+        optional and only keeps your favorite stories.
+      </li>
+      <li>
+        For an account we need just an email and a password. We don't ask for your name or any other
+        details, and we don't sell data.
+      </li>
       <li>We don't show ads and don't build profiles of visitors.</li>
       <li>Analytics cookies are used only if you accept them, and you can change your mind.</li>
     </ul>
@@ -40,6 +46,21 @@ usePageMeta(() => ({
       type. We use it only to deliver the site, keep it secure and fix errors. Legal basis: our
       legitimate interest in running a secure website (Art. 6(1)(f) GDPR). Logs are kept for a short
       period and then deleted; we don't combine them with other data.
+    </p>
+    <p><strong>Your account (only if you create one).</strong></p>
+    <p>
+      Your email address, your password (stored only as a one-way hash: we can't see it), the date
+      you signed up, the date and version of the Terms of Use you accepted, and the stories you add
+      to your favorites. We use them to run your account: to sign you in, keep your favorites and
+      send service emails (confirming your address, resetting your password, confirming an email
+      change). We never send newsletters or ads. Legal basis: performing our agreement with you
+      (Art. 6(1)(b) GDPR). While you are signed in, your browser keeps a sign-in token in local
+      storage; it is removed when you sign out.
+    </p>
+    <p>
+      We keep account data until you delete the account. You can do that yourself at any time on the
+      Account page: the account and its favorites are deleted at once, and you are signed out on all
+      devices.
     </p>
     <p><strong>Analytics (only with your consent).</strong></p>
     <p>
@@ -63,6 +84,11 @@ usePageMeta(() => ({
       <li>
         <strong>Our hosting provider</strong>, which runs the servers on our behalf under a data
         processing agreement.
+      </li>
+      <li>
+        <strong>Brevo</strong> (Sendinblue SAS, France), which delivers our service emails on our
+        behalf. It receives your email address and the content of those emails, and processes them
+        in the EU.
       </li>
       <li>
         <strong>Google Ireland Limited</strong> (Gordon House, Barrow Street, Dublin 4, Ireland),
@@ -101,14 +127,16 @@ usePageMeta(() => ({
     </ul>
     <p>
       Write to <a :href="`mailto:${SITE.contact}`">{{ SITE.contact }}</a
-      >. We answer within one month. Since we don't know who our visitors are, we may need details
-      (such as an IP address and time of visit) to find data relating to you.
+      >, from the email address of your account if you have one. We answer within one month. For
+      visitors without an account we may need details (such as an IP address and time of visit) to
+      find data relating to you.
     </p>
 
     <h2>Children</h2>
     <p>
-      The site is a general news service not directed at children, and we don't knowingly collect
-      data from them.
+      The site is a general news service not directed at children. You must be at least 16 to create
+      an account, and we don't knowingly collect data from children; if we learn of such an account,
+      we delete it.
     </p>
 
     <h2>Changes</h2>

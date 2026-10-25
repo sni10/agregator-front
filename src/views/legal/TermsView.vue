@@ -1,7 +1,16 @@
 <script setup lang="ts">
 import { usePageMeta } from '@/composables/usePageMeta'
 import { SITE } from '@/site'
+import { TERMS_VERSION } from '@/api'
 import LegalPage from '@/components/LegalPage.vue'
+
+// the date of the version readers accept when they sign up
+const updated = new Date(`${TERMS_VERSION}T00:00:00Z`).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+  timeZone: 'UTC',
+})
 
 usePageMeta(() => ({
   title: 'Terms of Use',
@@ -10,7 +19,7 @@ usePageMeta(() => ({
 </script>
 
 <template>
-  <LegalPage title="Terms of Use" updated="October 25, 2026">
+  <LegalPage title="Terms of Use" :updated="updated">
     <p>
       These terms apply to your use of {{ SITE.name }} at renews.me (the "site"). By using the site
       you agree to them. If you don't agree, please don't use the site.
@@ -20,9 +29,25 @@ usePageMeta(() => ({
     <p>
       {{ SITE.name }} is a free news aggregator. It collects reports on IT, artificial intelligence
       and crypto from other publications, presents them as short stories and links to the original
-      articles. No registration is needed. We may change, suspend or stop any part of the site at
-      any time.
+      articles. Reading is free and needs no account. We may change, suspend or stop any part of the
+      site at any time.
     </p>
+
+    <h2>Your account</h2>
+    <ul>
+      <li>
+        An account is optional and free; it lets you keep favorite stories. To create one you must
+        be at least 16 and accept these terms.
+      </li>
+      <li>
+        Use an email address you control, keep your password secret, and tell us if you think
+        someone else has used your account. You are responsible for what is done under it.
+      </li>
+      <li>
+        You can delete your account at any time on the Account page. We may suspend or delete an
+        account that breaks these terms or is used to attack or overload the site.
+      </li>
+    </ul>
 
     <h2>Content and intellectual property</h2>
     <ul>

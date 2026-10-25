@@ -5,6 +5,7 @@ import { useLoad } from '@/composables/useLoad'
 import { usePageMeta } from '@/composables/usePageMeta'
 import { SOURCE_REL, SITE, categoryStyle, formatDate, plural } from '@/site'
 import StoryCover from '@/components/StoryCover.vue'
+import FavoriteButton from '@/components/FavoriteButton.vue'
 import NotFoundView from './NotFoundView.vue'
 
 const props = defineProps<{ slug: string }>()
@@ -74,6 +75,10 @@ usePageMeta(() => {
         <time :datetime="story.published_at">{{ formatDate(story.published_at) }}</time>
         <span>·</span>
         <span>{{ plural(story.source_count, 'source') }}</span>
+        <FavoriteButton
+          :slug="story.slug"
+          class="ml-auto border border-zinc-200 dark:border-zinc-700"
+        />
       </div>
 
       <p
