@@ -3,35 +3,38 @@ import { usePageMeta } from '@/composables/usePageMeta'
 import { SITE } from '@/site'
 
 usePageMeta(() => ({
-  title: 'How we make the news',
-  description: `How ${SITE.name} writes its stories: sources, fact checks and a language model.`,
+  title: 'About',
+  description: `${SITE.name} is a daily news aggregator for IT, AI and crypto: the day's stories from trusted sources, in one place.`,
 }))
 </script>
 
 <template>
   <article class="mx-auto max-w-2xl space-y-5 text-[17px] leading-8">
-    <h1 class="text-3xl font-black tracking-tight md:text-4xl">How we make the news</h1>
+    <h1 class="text-3xl font-black tracking-tight md:text-4xl">About {{ SITE.name }}</h1>
     <p>
-      {{ SITE.name }} follows IT, AI and crypto publications. When several of them report the same
-      event, we bring their articles together into one story and link every one of them under it.
+      {{ SITE.name }} is a news aggregator for people who work with technology or simply follow it.
+      Every day we gather the latest news on IT, artificial intelligence and crypto from leading
+      tech publications, so you can catch up on what matters in a few minutes instead of an hour of
+      browsing.
     </p>
-    <h2 class="pt-2 text-xl font-bold">Facts first</h2>
+    <h2 class="pt-2 text-xl font-bold">One story instead of ten tabs</h2>
     <p>
-      From the articles we take only checkable facts: who did what, when, how much, which version.
-      Each fact keeps the exact quote it comes from, and a program makes sure the quote, its numbers
-      and names really are in that article.
+      When several outlets cover the same event, you don't get the same headline over and over. We
+      bring their reports together into one short story with the key facts, and link every original
+      article under it, so you can read more from the source you trust.
     </p>
-    <h2 class="pt-2 text-xl font-bold">Written by a model, checked sentence by sentence</h2>
+    <h2 class="pt-2 text-xl font-bold">Fresh, all day long</h2>
     <p>
-      A language model running on our own computer writes the story from those facts only. Then
-      every sentence is checked against them again; a sentence the facts do not support is removed.
-      Stories about hacks, lawsuits, fines, regulation or crypto prices need at least two
-      independent sources, or a human looks at them first.
+      The feed updates throughout the day. Pick a topic (IT, AI or Crypto) to see only what you care
+      about, search for anything we have covered, or follow us by
+      <a href="/rss.xml" class="text-violet-600 underline dark:text-violet-400">RSS</a>. When a
+      story develops, follow-ups are linked to the original, so you can see what happened next.
     </p>
-    <h2 class="pt-2 text-xl font-bold">What we don't do</h2>
+    <h2 class="pt-2 text-xl font-bold">Facts and sources</h2>
     <p>
-      We don't copy articles, give investment advice or predict prices. Mistakes still happen: the
-      sources linked under every story are the place to read the full details.
+      Every story is based on the linked articles only. Sensitive topics such as hacks, lawsuits or
+      crypto prices need more than one independent source. We don't give investment advice or
+      predict prices.
     </p>
   </article>
 </template>
