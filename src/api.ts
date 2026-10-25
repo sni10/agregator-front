@@ -5,6 +5,18 @@ export interface Category {
   name: string
 }
 
+// Stock photo of a story: 16:9 WebP variants, absolute URLs
+export interface Image {
+  src: string // the 1200 px variant
+  srcset: string
+  width: number
+  height: number
+  author: string
+  author_url: string // '' when the author has no profile link
+  source: string // e.g. Pixabay
+  page_url: string
+}
+
 export interface Story {
   slug: string
   type: 'event' | 'digest'
@@ -14,6 +26,7 @@ export interface Story {
   event_at: string | null // when it happened (earliest source)
   published_at: string
   source_count: number
+  image: Image | null // null: the category gradient stands in
 }
 
 export interface StoryLink {

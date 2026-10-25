@@ -82,7 +82,35 @@ usePageMeta(() => {
         }}</RouterLink>
       </p>
 
-      <StoryCover :category="category" class="mt-8 h-64 rounded-2xl md:h-80" />
+      <figure class="mt-8">
+        <StoryCover
+          :category="category"
+          :image="story.image"
+          sizes="(min-width: 1024px) 720px, 100vw"
+          priority
+          class="h-64 rounded-2xl md:h-80"
+        />
+        <figcaption v-if="story.image" class="mt-2 text-xs text-zinc-500">
+          Photo:
+          <a
+            v-if="story.image.author_url"
+            :href="story.image.author_url"
+            rel="nofollow noopener"
+            target="_blank"
+            class="hover:underline"
+            >{{ story.image.author }}</a
+          >
+          <template v-else>{{ story.image.author }}</template>
+          /
+          <a
+            :href="story.image.page_url"
+            rel="nofollow noopener"
+            target="_blank"
+            class="hover:underline"
+            >{{ story.image.source }}</a
+          >
+        </figcaption>
+      </figure>
 
       <!-- body_html is rendered from Markdown and sanitized by the backend (nh3 allowlist) -->
       <!-- eslint-disable-next-line vue/no-v-html -->

@@ -14,7 +14,13 @@ const style = computed(() => categoryStyle(props.story.category.slug))
     :to="`/news/${story.slug}`"
     class="group grid overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
   >
-    <StoryCover :category="story.category.slug" class="h-56 min-h-[16rem] md:h-full" />
+    <StoryCover
+      :category="story.category.slug"
+      :image="story.image"
+      sizes="(min-width: 1024px) 720px, 100vw"
+      priority
+      class="h-56 min-h-[16rem] md:h-full"
+    />
     <div class="p-6 md:p-10">
       <span class="text-xs font-bold tracking-wider text-violet-600 uppercase dark:text-violet-400"
         >Top story</span
@@ -36,7 +42,12 @@ const style = computed(() => categoryStyle(props.story.category.slug))
     :to="`/news/${story.slug}`"
     class="group flex flex-col overflow-hidden rounded-2xl border border-zinc-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
   >
-    <StoryCover :category="story.category.slug" class="h-36" />
+    <StoryCover
+      :category="story.category.slug"
+      :image="story.image"
+      sizes="(min-width: 768px) 33vw, 100vw"
+      class="h-36"
+    />
     <div class="flex flex-1 flex-col p-5">
       <h3
         class="text-lg leading-snug font-bold group-hover:text-violet-700 dark:group-hover:text-violet-300"
