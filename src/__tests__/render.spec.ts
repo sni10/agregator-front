@@ -34,6 +34,7 @@ const detail: StoryDetail = {
   follow_ups: [
     { slug: 'php-next', title: 'Another PHP flaw', published_at: '2026-10-23T10:00:00Z' },
   ],
+  coins: [],
   updated_at: '2026-10-21T15:00:00Z',
 }
 const feed: Page<Story> = { count: 1, next: null, previous: null, results: [story] }

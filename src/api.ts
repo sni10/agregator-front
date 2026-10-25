@@ -47,6 +47,7 @@ export interface StoryDetail extends Story {
   sources: Source[]
   previous: StoryLink | null // the story this one follows up
   follow_ups: StoryLink[]
+  coins: string[] // CoinGecko ids of the coins the story names: their prices come from getPrices()
   updated_at: string
 }
 
@@ -112,8 +113,41 @@ export const getFeed = (category: string, page: number) =>
 export const getStory = (slug: string) =>
   get<StoryDetail>(`/publications/${encodeURIComponent(slug)}`)
 
-export const search = (q: string, page: number) =>
-  get<Page<Story>>('/search', { q, page: page > 1 ? page : undefined })
+// Search with filters, all optional; no words but a filter = the filtered feed, newest first.
+// fuzzy: nothing matched exactly, these are titles that look like the words (a typo).
+export interface SearchQuery {
+  q: string
+  category: string // it | ai | crypto
+  since: string // day | week | month | year
+  sources: number // at least this many
+  sort: string // relevance (default) | newest
+}
+
+export const search = (query: Partial<SearchQuery>, page: number) =>
+  get<Page<Story> & { fuzzy: boolean }>('/search', {
+    ...query,
+    page: page > 1 ? page : undefined,
+  })
+
+export interface Suggestion {
+  slug: string
+  title: string
+  category: string
+}
+
+// titles while the reader types: the last word counts as a prefix
+export const suggest = (q: string) => get<Suggestion[]>('/search/suggest', { q })
+
+// USD prices of the coins stories name, a couple of minutes old; 503 when there are none
+export interface Price {
+  id: string
+  symbol: string
+  name: string
+  usd: number
+  change_24h: number | null // percent
+}
+
+export const getPrices = () => get<Price[]>('/prices')
 
 // --- accounts (browser only: the server render never has a token) ---
 

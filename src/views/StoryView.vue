@@ -6,6 +6,7 @@ import { usePageMeta } from '@/composables/usePageMeta'
 import { SOURCE_REL, SITE, categoryStyle, formatDate, plural } from '@/site'
 import StoryCover from '@/components/StoryCover.vue'
 import FavoriteButton from '@/components/FavoriteButton.vue'
+import CoinPrices from '@/components/CoinPrices.vue'
 import NotFoundView from './NotFoundView.vue'
 
 const props = defineProps<{ slug: string }>()
@@ -80,6 +81,7 @@ usePageMeta(() => {
           class="ml-auto border border-zinc-200 dark:border-zinc-700"
         />
       </div>
+      <CoinPrices v-if="story.coins?.length" :ids="story.coins" class="mt-4" />
 
       <p
         v-if="story.previous"

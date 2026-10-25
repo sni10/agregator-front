@@ -7,6 +7,7 @@ import { usePageMeta } from '@/composables/usePageMeta'
 import { categoryStyle } from '@/site'
 import StoryTile from '@/components/StoryTile.vue'
 import PageLinks from '@/components/PageLinks.vue'
+import CoinPrices from '@/components/CoinPrices.vue'
 
 const props = defineProps<{ category?: string }>()
 const route = useRoute()
@@ -39,6 +40,7 @@ usePageMeta(() => ({
   </p>
 
   <template v-else-if="data">
+    <CoinPrices v-if="category === 'crypto'" :limit="8" class="mb-6" />
     <section v-if="lead" class="mb-10"><StoryTile :story="lead" lead /></section>
     <h2 class="mb-4 text-sm font-bold tracking-wider text-zinc-500 uppercase">
       {{ label ? `Latest in ${label}` : 'Latest' }}

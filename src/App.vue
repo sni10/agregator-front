@@ -4,6 +4,7 @@ import { consentOpen } from '@/consent'
 import CookieBanner from '@/components/CookieBanner.vue'
 import AuthDialog from '@/components/AuthDialog.vue'
 import UserMenu from '@/components/UserMenu.vue'
+import SearchBox from '@/components/SearchBox.vue'
 
 const LEGAL = [
   { to: '/about', label: 'About' },
@@ -40,17 +41,25 @@ const LEGAL = [
             >{{ item.label }}</RouterLink
           >
         </nav>
-        <form action="/search" method="get" role="search" class="ml-auto hidden sm:block">
-          <input
-            name="q"
-            type="search"
-            placeholder="Search"
-            aria-label="Search stories"
-            :value="$route.name === 'search' ? $route.query.q : ''"
-            class="w-44 rounded-full border border-zinc-200 bg-white px-3 py-1 text-sm outline-none focus:border-violet-400 dark:border-zinc-700 dark:bg-zinc-900"
-          />
-        </form>
-        <UserMenu class="max-sm:ml-auto" />
+        <SearchBox hotkey class="ml-auto hidden w-56 sm:block lg:w-72" />
+        <!-- phones: no room for the box, the search page has a big one -->
+        <RouterLink
+          to="/search"
+          class="ml-auto flex size-9 items-center justify-center rounded-full hover:bg-zinc-100 sm:hidden dark:hover:bg-zinc-800"
+          aria-label="Search"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            class="size-5"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <circle cx="11" cy="11" r="7" />
+            <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+          </svg>
+        </RouterLink>
+        <UserMenu />
       </div>
     </header>
 
