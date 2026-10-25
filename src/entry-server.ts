@@ -32,7 +32,11 @@ export async function render(url: string, origin = '') {
         `<meta property="og:site_name" content="${esc(SITE.name)}">`,
         `<meta property="og:title" content="${esc(m.title)}">`,
         `<meta property="og:description" content="${esc(m.description)}">`,
-        `<meta name="twitter:card" content="summary">`,
+        // a picture ≥ 1200 px: large previews in Discover and social networks
+        m.image ? `<meta property="og:image" content="${esc(m.image.src)}">` : '',
+        m.image ? `<meta property="og:image:width" content="${m.image.width}">` : '',
+        m.image ? `<meta property="og:image:height" content="${m.image.height}">` : '',
+        `<meta name="twitter:card" content="${m.image ? 'summary_large_image' : 'summary'}">`,
         m.publishedAt
           ? `<meta property="article:published_time" content="${esc(m.publishedAt)}">`
           : '',
@@ -40,19 +44,25 @@ export async function render(url: string, origin = '') {
           ? `<meta property="article:modified_time" content="${esc(m.modifiedAt)}">`
           : '',
         m.noindex ? `<meta name="robots" content="noindex">` : '',
+        pageUrl ? `<meta name="robots" content="max-image-preview:large">` : '',
         pageUrl ? `<meta property="og:url" content="${esc(pageUrl)}">` : '',
         pageUrl ? `<link rel="canonical" href="${esc(pageUrl)}">` : '',
         m.jsonLd
-          ? `<script type="application/ld+json">${json({ ...m.jsonLd, url: pageUrl || undefined })}</script>`
+          ? `<script type="application/ld+json">${json({
+              ...m.jsonLd,
+              url: pageUrl || undefined,
+              mainEntityOfPage: pageUrl || undefined,
+            })}</script>`
           : '',
       ]
-        .filter(Boolean)
-        .join('\n    ')
-    : ''
+    : []
+  tags.push(
+    `<link rel="alternate" type="application/rss+xml" title="${esc(SITE.name)}" href="${esc(origin)}/rss.xml">`,
+  )
 
   return {
     html,
-    head: tags,
+    head: tags.filter(Boolean).join('\n    '),
     state: `<script>window.__SSR_STATE__=${json(state)}</script>`,
     status,
   }

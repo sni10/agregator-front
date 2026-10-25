@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render } from '../entry-server'
-import type { Page, Story, StoryDetail } from '../api'
+import type { Image, Page, Story, StoryDetail } from '../api'
 
 const story: Story = {
   slug: 'php-patches',
@@ -12,6 +12,17 @@ const story: Story = {
   event_at: null,
   published_at: '2026-10-21T14:00:00Z',
   source_count: 2,
+  image: null,
+}
+const image: Image = {
+  src: 'https://cdn.test/p-1200.webp',
+  srcset: 'https://cdn.test/p-320.webp 320w, https://cdn.test/p-1200.webp 1200w',
+  width: 1200,
+  height: 675,
+  author: 'geralt',
+  author_url: 'https://pixabay.com/users/geralt-9301/',
+  source: 'Pixabay',
+  page_url: 'https://pixabay.com/photos/p-1/',
 }
 const detail: StoryDetail = {
   ...story,
@@ -66,7 +77,58 @@ describe('server render', () => {
     expect(page.html).toContain('What happened next')
     expect(page.head).toContain('"@type":"NewsArticle"')
     expect(page.head).toContain('<meta property="og:type" content="article">')
-    expect(page.head).toContain('<title>PHP releases emergency patches · agregator</title>')
+    expect(page.head).toContain('<title>PHP releases emergency patches · Renews</title>')
+    expect(page.head).toContain('"mainEntityOfPage":"https://site.test/news/php-patches"')
+    expect(page.head).toContain('<meta name="robots" content="max-image-preview:large">')
+    expect(page.head).toContain('href="https://site.test/rss.xml"')
+  })
+
+  it('renders a story without a photo with the gradient cover and a small card', async () => {
+    api({ '/publications/php-patches': detail, '/publications': feed })
+
+    const page = await render('/news/php-patches', 'https://site.test')
+
+    expect(page.html).toContain('bg-gradient-to-br')
+    expect(page.html).not.toContain('<img')
+    expect(page.html).not.toContain('Photo:')
+    expect(page.head).toContain('<meta name="twitter:card" content="summary">')
+    expect(page.head).not.toContain('og:image')
+  })
+
+  it('renders a story photo with its srcset, credit and large previews', async () => {
+    api({ '/publications/php-patches': { ...detail, image }, '/publications': feed })
+
+    const page = await render('/news/php-patches', 'https://site.test')
+
+    expect(page.html).toMatch(/<img[^>]+srcset="https:\/\/cdn.test\/p-320.webp 320w,/)
+    expect(page.html).toContain('fetchpriority="high"')
+    expect(page.html).toContain('href="https://pixabay.com/users/geralt-9301/"')
+    expect(page.html).toMatch(/rel="nofollow noopener" target="_blank"[^>]*>geralt<\/a>/)
+    expect(page.head).toContain('<meta property="og:image" content="https://cdn.test/p-1200.webp">')
+    expect(page.head).toContain('<meta property="og:image:height" content="675">')
+    expect(page.head).toContain('<meta name="twitter:card" content="summary_large_image">')
+    expect(page.head).toContain('"image":["https://cdn.test/p-1200.webp"]')
+  })
+
+  it('credits a photo author without a profile link as plain text', async () => {
+    const photo = { ...image, author_url: '' }
+    api({ '/publications/php-patches': { ...detail, image: photo }, '/publications': feed })
+
+    const page = await render('/news/php-patches', 'https://site.test')
+
+    expect(page.html).toContain('geralt')
+    expect(page.html).not.toContain('pixabay.com/users')
+  })
+
+  it('loads feed photos lazily, except the top story', async () => {
+    const tile = { ...story, slug: 'other', image }
+    api({ '/publications': { ...feed, count: 2, results: [{ ...story, image }, tile] } })
+
+    const page = await render('/', 'https://site.test')
+
+    expect(page.html.match(/<img[^>]+fetchpriority="high"/g)).toHaveLength(1)
+    expect(page.html.match(/<img[^>]+loading="lazy"/g)).toHaveLength(1)
+    expect(page.html).toContain('sizes="(min-width: 768px) 33vw, 100vw"')
   })
 
   it('answers 404 for an unknown story and an unknown page', async () => {
@@ -91,6 +153,7 @@ describe('server render', () => {
     const page = await render('/search?q=php')
 
     expect(page.head).toContain('<meta name="robots" content="noindex">')
+    expect(page.head).not.toContain('max-image-preview')
     expect(page.html).toContain('1 story for “php”')
   })
 })

@@ -17,6 +17,7 @@ export interface PageMeta {
   type?: 'website' | 'article'
   publishedAt?: string // article:published_time
   modifiedAt?: string
+  image?: { src: string; width: number; height: number } // og:image
   jsonLd?: Record<string, unknown> // schema.org NewsArticle on a story page
   noindex?: boolean // search results
 }

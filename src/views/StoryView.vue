@@ -29,14 +29,18 @@ usePageMeta(() => {
     type: 'article',
     publishedAt: s.published_at,
     modifiedAt: s.updated_at,
+    image: s.image ?? undefined,
+    // url and mainEntityOfPage (the canonical link) are added by the server render
     jsonLd: {
       '@context': 'https://schema.org',
       '@type': 'NewsArticle',
       headline: s.title,
       description: s.summary,
+      image: s.image ? [s.image.src] : undefined,
       datePublished: s.published_at,
       dateModified: s.updated_at,
       articleSection: s.category.name,
+      author: { '@type': 'Organization', name: SITE.name },
       publisher: { '@type': 'Organization', name: SITE.name },
       isBasedOn: s.sources.map((source) => source.url),
     },
