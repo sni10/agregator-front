@@ -6,6 +6,7 @@ import { usePageMeta } from '@/composables/usePageMeta'
 import { plural } from '@/site'
 import StoryTile from '@/components/StoryTile.vue'
 import PageLinks from '@/components/PageLinks.vue'
+import NotifySettings from '@/components/NotifySettings.vue'
 
 // Client only: the server has no token. An un-hearted story stays until reload (click again to undo).
 const route = useRoute()
@@ -27,12 +28,15 @@ onMounted(async () => {
 </script>
 
 <template>
-  <h1 class="mb-6 text-2xl font-black tracking-tight">
-    Favorites
-    <span v-if="data" class="text-base font-medium text-zinc-500">{{
-      plural(data.count, 'story')
-    }}</span>
-  </h1>
+  <div class="mb-6 flex items-center justify-between gap-4">
+    <h1 class="text-2xl font-black tracking-tight">
+      Favorites
+      <span v-if="data" class="text-base font-medium text-zinc-500">{{
+        plural(data.count, 'story')
+      }}</span>
+    </h1>
+    <NotifySettings />
+  </div>
 
   <p v-if="error" class="text-zinc-500" role="alert">{{ error }}</p>
   <p v-else-if="!data" class="text-zinc-500" role="status">Loading…</p>
