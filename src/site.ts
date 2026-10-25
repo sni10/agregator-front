@@ -1,6 +1,6 @@
 // Site name and the look of each category (cover gradient, badge colours), as in the mockups.
 export const SITE = {
-  name: 'agregator',
+  name: 'Renews',
   description:
     'IT, AI and crypto news: each story brings several sources together, with every claim checked against them.',
 }
