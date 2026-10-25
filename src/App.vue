@@ -1,5 +1,15 @@
 <script setup lang="ts">
 import { NAV, SITE } from '@/site'
+import { consentOpen } from '@/consent'
+import CookieBanner from '@/components/CookieBanner.vue'
+
+const LEGAL = [
+  { to: '/about', label: 'About' },
+  { to: '/privacy', label: 'Privacy' },
+  { to: '/cookies', label: 'Cookies' },
+  { to: '/terms', label: 'Terms' },
+  { to: '/disclaimer', label: 'Disclaimer' },
+]
 </script>
 
 <template>
@@ -48,13 +58,26 @@ import { NAV, SITE } from '@/site'
     <footer
       class="border-t border-zinc-200 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800"
     >
-      <nav class="flex justify-center gap-4" aria-label="Site">
-        <RouterLink to="/about" class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
-          >About</RouterLink
+      <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 px-4" aria-label="Site">
+        <RouterLink
+          v-for="link in LEGAL"
+          :key="link.to"
+          :to="link.to"
+          class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
+          >{{ link.label }}</RouterLink
         >
+        <button
+          type="button"
+          class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
+          @click="consentOpen = true"
+        >
+          Cookie settings
+        </button>
         <!-- served next to the app, not one of its routes -->
         <a href="/rss.xml" class="underline hover:text-zinc-700 dark:hover:text-zinc-300">RSS</a>
       </nav>
+      <p class="mt-3">© {{ new Date().getFullYear() }} {{ SITE.name }}</p>
     </footer>
+    <CookieBanner />
   </div>
 </template>

@@ -156,4 +156,14 @@ describe('server render', () => {
     expect(page.head).not.toContain('max-image-preview')
     expect(page.html).toContain('1 story for “php”')
   })
+  it('renders the legal pages, linked from the footer, without the cookie banner', async () => {
+    api({})
+
+    for (const path of ['/privacy', '/cookies', '/terms', '/disclaimer']) {
+      const page = await render(path, 'https://site.test')
+      expect(page.status).toBe(200)
+      expect(page.html).toContain(`href="${path}"`)
+      expect(page.html).not.toContain('role="dialog"') // shown by the client only
+    }
+  })
 })

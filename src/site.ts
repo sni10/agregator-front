@@ -1,6 +1,7 @@
 // Site name and the look of each category (cover gradient, badge colours), as in the mockups.
 export const SITE = {
   name: 'Renews',
+  contact: 'contact@renews.me', // privacy requests, corrections, copyright notices
   description:
     'IT, AI and crypto news: each story brings several sources together, with every claim checked against them.',
 }

@@ -24,6 +24,22 @@ export function createRouter() {
       { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue') },
       { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
       {
+        path: '/privacy',
+        name: 'privacy',
+        component: () => import('@/views/legal/PrivacyView.vue'),
+      },
+      {
+        path: '/cookies',
+        name: 'cookies',
+        component: () => import('@/views/legal/CookiesView.vue'),
+      },
+      { path: '/terms', name: 'terms', component: () => import('@/views/legal/TermsView.vue') },
+      {
+        path: '/disclaimer',
+        name: 'disclaimer',
+        component: () => import('@/views/legal/DisclaimerView.vue'),
+      },
+      {
         path: '/:path(.*)*',
         name: 'not-found',
         component: () => import('@/views/NotFoundView.vue'),
