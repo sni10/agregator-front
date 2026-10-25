@@ -165,6 +165,17 @@ usePageMeta(() => {
           Every sentence of this story was checked against facts quoted from these articles.
           <RouterLink to="/about" class="underline">How we make the news</RouterLink>
         </p>
+        <p class="mt-2 text-xs text-zinc-500">
+          Spotted an error?
+          <RouterLink
+            :to="{
+              path: '/contact',
+              query: { topic: 'correction', pageUrl: `${SITE.url}/news/${story.slug}` },
+            }"
+            class="underline"
+            >Tell us</RouterLink
+          >
+        </p>
       </section>
     </article>
 

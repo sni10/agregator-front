@@ -36,5 +36,11 @@ usePageMeta(() => ({
       crypto prices need more than one independent source. We don't give investment advice or
       predict prices.
     </p>
+    <p>
+      Questions, corrections or copyright notices:
+      <RouterLink to="/contact" class="text-violet-600 underline dark:text-violet-400"
+        >contact us</RouterLink
+      >.
+    </p>
   </article>
 </template>

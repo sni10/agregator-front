@@ -20,8 +20,7 @@ usePageMeta(() => ({
     <h2>Who is responsible</h2>
     <p>
       The controller of your personal data is {{ SITE.name }}. For any question or request about
-      your data, write to <a :href="`mailto:${SITE.contact}`">{{ SITE.contact }}</a
-      >.
+      your data, write to us through <RouterLink to="/contact">our contact form</RouterLink>.
     </p>
 
     <h2>The short version</h2>
@@ -62,6 +61,15 @@ usePageMeta(() => ({
       Account page: the account and its favorites are deleted at once, and you are signed out on all
       devices.
     </p>
+    <p><strong>The contact form.</strong></p>
+    <p>
+      When you write to us through the contact form, we receive the topic, your email address, the
+      link and the message you enter, together with your IP address and browser type (to fight
+      spam), and your account if you are signed in. The message is emailed to our editors so we can
+      answer you. Legal basis: our legitimate interest in answering you and correcting our stories
+      (Art. 6(1)(f) GDPR). Messages are deleted after three years. To stop spam bots, the form uses
+      Cloudflare Turnstile, which checks your browser when you open the form.
+    </p>
     <p><strong>Analytics (only with your consent).</strong></p>
     <p>
       If you click "Accept" in the cookie banner, we use Google Analytics 4 to understand how the
@@ -99,6 +107,11 @@ usePageMeta(() => ({
           >Google's privacy policy</a
         >.
       </li>
+      <li>
+        <strong>Cloudflare, Inc.</strong> (101 Townsend St, San Francisco, CA 94107, USA), only on
+        the contact form, for the Turnstile spam check. It may process your IP address and browser
+        data in the United States under the EU-U.S. Data Privacy Framework.
+      </li>
     </ul>
     <p>We don't share personal data with anyone else unless the law requires it.</p>
 
@@ -126,10 +139,10 @@ usePageMeta(() => ({
       </li>
     </ul>
     <p>
-      Write to <a :href="`mailto:${SITE.contact}`">{{ SITE.contact }}</a
-      >, from the email address of your account if you have one. We answer within one month. For
-      visitors without an account we may need details (such as an IP address and time of visit) to
-      find data relating to you.
+      Write to us through <RouterLink to="/contact">our contact form</RouterLink>, with the email
+      address of your account if you have one. We answer within one month. For visitors without an
+      account we may need details (such as an IP address and time of visit) to find data relating to
+      you.
     </p>
 
     <h2>Children</h2>

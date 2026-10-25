@@ -99,8 +99,8 @@ usePageMeta(() => ({
     <h2>Corrections and complaints</h2>
     <p>
       If you find a mistake in a story, or believe content on the site infringes your rights, write
-      to <a :href="`mailto:${SITE.contact}`">{{ SITE.contact }}</a> with a link to the page. We
-      review every notice and correct or remove content where it is justified.
+      to us through <RouterLink to="/contact?topic=correction">our contact form</RouterLink> with a
+      link to the page. We review every notice and correct or remove content where it is justified.
     </p>
 
     <h2>Changes to these terms</h2>

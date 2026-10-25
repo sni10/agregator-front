@@ -7,6 +7,7 @@ import UserMenu from '@/components/UserMenu.vue'
 
 const LEGAL = [
   { to: '/about', label: 'About' },
+  { to: '/contact', label: 'Contact' },
   { to: '/privacy', label: 'Privacy' },
   { to: '/cookies', label: 'Cookies' },
   { to: '/terms', label: 'Terms' },

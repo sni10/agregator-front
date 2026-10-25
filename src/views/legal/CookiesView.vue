@@ -96,9 +96,6 @@ usePageMeta(() => ({
     </p>
 
     <h2>Contact</h2>
-    <p>
-      Questions about cookies: <a :href="`mailto:${SITE.contact}`">{{ SITE.contact }}</a
-      >.
-    </p>
+    <p>Questions about cookies: use <RouterLink to="/contact">our contact form</RouterLink>.</p>
   </LegalPage>
 </template>

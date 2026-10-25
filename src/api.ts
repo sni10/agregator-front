@@ -257,3 +257,14 @@ export const getFavorites = (page: number) =>
   request<Page<Story>>('GET', `/me/favorites${page > 1 ? `?page=${page}` : ''}`)
 
 export const getFavoriteSlugs = () => request<string[]>('GET', '/me/favorites/slugs')
+
+// The contact form: the backend emails it to the editors (the address never reaches the browser).
+// 400 {field: [msg]}, {captcha} = the token didn't pass (get a new one); 429 = 5 an hour per IP
+export type ContactTopic = 'question' | 'correction' | 'copyright' | 'other'
+export const sendContact = (message: {
+  topic: ContactTopic
+  email: string
+  pageUrl: string
+  message: string
+  captcha: string
+}) => post<void>('/contact', message)

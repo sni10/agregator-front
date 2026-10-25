@@ -23,6 +23,7 @@ export function createRouter() {
       },
       { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue') },
       { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
+      { path: '/contact', name: 'contact', component: () => import('@/views/ContactView.vue') },
       // accounts: all noindex, filled in the browser only
       ...(['login', 'register'] as const).map((mode) => ({
         path: `/${mode}`,

@@ -30,9 +30,8 @@ usePageMeta(() => ({
       Stories are based on reports from other publications, linked under each story. We check them
       carefully, but sources can be wrong, events move fast and mistakes happen. We give no
       guarantee that any story is complete, accurate or current. For the full details, read the
-      original sources. If you spot an error, tell us at
-      <a :href="`mailto:${SITE.contact}`">{{ SITE.contact }}</a
-      >.
+      original sources. If you spot an error, tell us through
+      <RouterLink to="/contact?topic=correction">our contact form</RouterLink>.
     </p>
 
     <h2>Third parties</h2>
