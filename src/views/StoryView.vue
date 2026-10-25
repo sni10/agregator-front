@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { getFeed, getStory } from '@/api'
 import { useLoad } from '@/composables/useLoad'
 import { usePageMeta } from '@/composables/usePageMeta'
-import { SITE, categoryStyle, formatDate, plural } from '@/site'
+import { SOURCE_REL, SITE, categoryStyle, formatDate, plural } from '@/site'
 import StoryCover from '@/components/StoryCover.vue'
 import NotFoundView from './NotFoundView.vue'
 
@@ -99,7 +99,7 @@ usePageMeta(() => {
           <a
             v-if="story.image.author_url"
             :href="story.image.author_url"
-            rel="nofollow noopener"
+            :rel="SOURCE_REL"
             target="_blank"
             class="hover:underline"
             >{{ story.image.author }}</a
@@ -108,7 +108,7 @@ usePageMeta(() => {
           /
           <a
             :href="story.image.page_url"
-            rel="nofollow noopener"
+            :rel="SOURCE_REL"
             target="_blank"
             class="hover:underline"
             >{{ story.image.source }}</a
@@ -146,7 +146,7 @@ usePageMeta(() => {
         <h2 class="text-sm font-bold tracking-wider text-zinc-500 uppercase">Sources</h2>
         <ul class="mt-3 divide-y divide-zinc-100 dark:divide-zinc-800">
           <li v-for="source in story.sources" :key="source.url" class="py-3">
-            <a :href="source.url" target="_blank" rel="noopener" class="group block">
+            <a :href="source.url" target="_blank" :rel="SOURCE_REL" class="group block">
               <span class="text-xs font-semibold text-violet-600 dark:text-violet-400">{{
                 source.publisher
               }}</span>

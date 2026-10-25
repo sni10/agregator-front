@@ -55,4 +55,7 @@ export function formatDate(iso: string | null) {
   })
 }
 
+// rel of links to the sources of a story and its photo: cited, but passed no ranking weight
+export const SOURCE_REL = 'nofollow noopener'
+
 export const plural = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`

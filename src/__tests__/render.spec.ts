@@ -166,4 +166,14 @@ describe('server render', () => {
       expect(page.html).not.toContain('role="dialog"') // shown by the client only
     }
   })
+  it('passes no ranking weight to the sources and the photo, but leaves body links alone', async () => {
+    const body_html = '<p><a href="https://php.net/x">PHP</a></p>'
+    api({ '/publications/php-patches': { ...detail, body_html, image }, '/publications': feed })
+
+    const page = await render('/news/php-patches', 'https://site.test')
+
+    expect(page.html).toContain('<a href="https://php.net/x">')
+    expect(page.html).toMatch(/href="https:\/\/lwn.net\/a" target="_blank" rel="nofollow noopener"/)
+    expect(page.html).toMatch(/href="https:\/\/pixabay.com\/photos\/p-1\/" rel="nofollow noopener"/)
+  })
 })
