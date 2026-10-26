@@ -50,6 +50,7 @@ usePageMeta(() => {
       datePublished: s.published_at,
       dateModified: s.updated_at,
       articleSection: s.category.name,
+      keywords: s.tags?.map((tag) => tag.name).join(', ') || undefined,
       author: { '@type': 'Organization', name: SITE.name },
       publisher: { '@type': 'Organization', name: SITE.name },
       isBasedOn: s.sources.map((source) => source.url),
@@ -138,6 +139,16 @@ usePageMeta(() => {
         class="story-body mt-8 space-y-5 text-[17px] leading-8 text-zinc-800 dark:text-zinc-200"
         v-html="story.body_html"
       />
+
+      <ul v-if="story.tags?.length" class="mt-8 flex flex-wrap gap-2" aria-label="Topics">
+        <li v-for="tag in story.tags" :key="tag.slug">
+          <RouterLink
+            :to="`/tag/${tag.slug}`"
+            class="block rounded-full border border-zinc-200 px-3 py-1 text-sm text-zinc-600 hover:border-violet-400 hover:text-violet-700 dark:border-zinc-700 dark:text-zinc-300 dark:hover:text-violet-300"
+            >#&nbsp;{{ tag.name }}</RouterLink
+          >
+        </li>
+      </ul>
 
       <section
         v-if="story.follow_ups.length"

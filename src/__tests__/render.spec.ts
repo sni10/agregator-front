@@ -36,6 +36,7 @@ const detail: StoryDetail = {
     { slug: 'php-next', title: 'Another PHP flaw', published_at: '2026-10-23T10:00:00Z' },
   ],
   coins: [],
+  tags: [{ slug: 'php', name: 'PHP' }],
   updated_at: '2026-10-21T15:00:00Z',
 }
 const feed: Page<Story> = { count: 1, next: null, previous: null, results: [story] }
@@ -83,6 +84,32 @@ describe('server render', () => {
     expect(page.head).toContain('"mainEntityOfPage":"https://site.test/news/php-patches"')
     expect(page.head).toContain('<meta name="robots" content="max-image-preview:large">')
     expect(page.head).toContain('href="https://site.test/rss.xml"')
+  })
+
+  it('renders a tag page, kept out of search engines while it has few stories', async () => {
+    const tag = { slug: 'php', name: 'PHP', count: 1, indexed: false }
+    api({ '/tags/php': tag, '/publications': feed })
+
+    const page = await render('/tag/php', 'https://site.test')
+
+    expect(page.status).toBe(200)
+    expect(page.html).toContain('PHP releases emergency patches')
+    expect(page.head).toContain('<title>PHP news · Renews</title>')
+    expect(page.head).toContain('<meta name="robots" content="noindex">')
+
+    api({ '/tags/php': { ...tag, count: 3, indexed: true }, '/publications': feed })
+    const indexed = await render('/tag/php', 'https://site.test')
+    expect(indexed.head).not.toContain('noindex')
+    expect(indexed.head).toContain('<link rel="canonical" href="https://site.test/tag/php">')
+  })
+
+  it('links a story to its tags', async () => {
+    api({ '/publications/php-patches': detail, '/publications': feed })
+
+    const page = await render('/news/php-patches', 'https://site.test')
+
+    expect(page.html).toContain('href="/tag/php"')
+    expect(page.head).toContain('"keywords":"PHP"')
   })
 
   it('renders a story without a photo with the gradient cover and a small card', async () => {

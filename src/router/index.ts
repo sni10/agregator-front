@@ -21,6 +21,12 @@ export function createRouter() {
         component: () => import('@/views/StoryView.vue'),
         props: true,
       },
+      {
+        path: '/tag/:slug',
+        name: 'tag',
+        component: () => import('@/views/TagView.vue'),
+        props: true,
+      },
       { path: '/search', name: 'search', component: () => import('@/views/SearchView.vue') },
       { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
       { path: '/contact', name: 'contact', component: () => import('@/views/ContactView.vue') },

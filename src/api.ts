@@ -30,6 +30,17 @@ export interface Story {
   image: Image | null // null: the category gradient stands in
 }
 
+// a subject running through many stories: a company, a product, a coin, a topic
+export interface Tag {
+  slug: string
+  name: string
+}
+
+export interface TagPage extends Tag {
+  count: number // published stories
+  indexed: boolean // enough stories for search engines: noindex otherwise
+}
+
 export interface StoryLink {
   slug: string
   title: string
@@ -49,6 +60,7 @@ export interface StoryDetail extends Story {
   previous: StoryLink | null // the story this one follows up
   follow_ups: StoryLink[]
   coins: string[] // CoinGecko ids of the coins the story names: their prices come from getPrices()
+  tags: Tag[]
   updated_at: string
 }
 
@@ -108,8 +120,10 @@ async function get<T>(path: string, query: Record<string, string | number | unde
   return (await res.json()) as T
 }
 
-export const getFeed = (category: string, page: number) =>
-  get<Page<Story>>('/publications', { category, page: page > 1 ? page : undefined })
+export const getFeed = (category: string, page: number, tag?: string) =>
+  get<Page<Story>>('/publications', { category, tag, page: page > 1 ? page : undefined })
+
+export const getTag = (slug: string) => get<TagPage>(`/tags/${encodeURIComponent(slug)}`)
 
 export const getStory = (slug: string) =>
   get<StoryDetail>(`/publications/${encodeURIComponent(slug)}`)
