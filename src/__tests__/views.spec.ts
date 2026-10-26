@@ -17,7 +17,7 @@ describe('view count', () => {
   })
 
   it('posts the view and ignores failures', async () => {
-    const fetch = vi.fn().mockRejectedValue(new Error('offline'))
+    const fetch = vi.fn<typeof globalThis.fetch>().mockRejectedValue(new Error('offline'))
     vi.stubGlobal('fetch', fetch)
     countView('a b')
     expect(fetch).toHaveBeenCalledWith(expect.stringMatching(/\/publications\/a%20b\/view$/), {
