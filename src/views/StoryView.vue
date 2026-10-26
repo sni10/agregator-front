@@ -1,12 +1,13 @@
 <script setup lang="ts">
-import { computed } from 'vue'
-import { getFeed, getStory } from '@/api'
+import { computed, onMounted, watch } from 'vue'
+import { countView, getFeed, getStory } from '@/api'
 import { useLoad } from '@/composables/useLoad'
 import { usePageMeta } from '@/composables/usePageMeta'
 import { SOURCE_REL, SITE, categoryStyle, formatDate, plural } from '@/site'
 import StoryCover from '@/components/StoryCover.vue'
 import FavoriteButton from '@/components/FavoriteButton.vue'
 import CoinPrices from '@/components/CoinPrices.vue'
+import ViewCount from '@/components/ViewCount.vue'
 import NotFoundView from './NotFoundView.vue'
 
 const props = defineProps<{ slug: string }>()
@@ -21,6 +22,13 @@ const story = computed(() => data.value?.story)
 const more = computed(() => data.value?.more)
 const category = computed(() => story.value?.category.slug ?? '')
 const style = computed(() => categoryStyle(category.value))
+
+// in the browser only, also when the router reuses this page for another story
+onMounted(() => countView(props.slug))
+watch(
+  () => props.slug,
+  (slug) => countView(slug),
+)
 
 usePageMeta(() => {
   const s = story.value
@@ -76,6 +84,7 @@ usePageMeta(() => {
         <time :datetime="story.published_at">{{ formatDate(story.published_at) }}</time>
         <span>·</span>
         <span>{{ plural(story.source_count, 'source') }}</span>
+        <ViewCount :views="story.views" />
         <FavoriteButton
           :slug="story.slug"
           class="ml-auto border border-zinc-200 dark:border-zinc-700"

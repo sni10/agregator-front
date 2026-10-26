@@ -12,6 +12,7 @@ const story: Story = {
   event_at: null,
   published_at: '2026-10-21T14:00:00Z',
   source_count: 2,
+  views: 0,
   image: null,
 }
 const image: Image = {

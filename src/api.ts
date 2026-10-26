@@ -26,6 +26,7 @@ export interface Story {
   event_at: string | null // when it happened (earliest source)
   published_at: string
   source_count: number
+  views: number // readers who opened it; the front shows it only from VIEWS_SHOWN_FROM
   image: Image | null // null: the category gradient stands in
 }
 
@@ -112,6 +113,15 @@ export const getFeed = (category: string, page: number) =>
 
 export const getStory = (slug: string) =>
   get<StoryDetail>(`/publications/${encodeURIComponent(slug)}`)
+
+// A reader opened the story: sent from the browser only (bots mostly run no scripts). Once a day per IP is
+// counted by the server; failures don't matter. keepalive: it survives a quick move to another page.
+export function countView(slug: string) {
+  fetch(`${API_URL}/publications/${encodeURIComponent(slug)}/view`, {
+    method: 'POST',
+    keepalive: true,
+  }).catch(() => {})
+}
 
 // Search with filters, all optional; no words but a filter = the filtered feed, newest first.
 // fuzzy: nothing matched exactly, these are titles that look like the words (a typo).

@@ -60,3 +60,10 @@ export const SOURCE_REL = 'nofollow noopener'
 
 export const plural = (n: number, word: string) =>
   `${n} ${n === 1 ? word : word.endsWith('y') ? `${word.slice(0, -1)}ies` : `${word}s`}`
+
+// A small count says "nobody reads this": the eye shows up only from here
+export const VIEWS_SHOWN_FROM = 100
+
+// 950, 1.2K, 34K, 1.5M
+export const compact = (n: number) =>
+  new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n)

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Story } from '@/api'
-import { categoryStyle, formatDate, plural } from '@/site'
+import { VIEWS_SHOWN_FROM, categoryStyle, formatDate, plural } from '@/site'
 import StoryCover from './StoryCover.vue'
 import FavoriteButton from './FavoriteButton.vue'
 import MarkedText from './MarkedText.vue'
+import ViewCount from './ViewCount.vue'
 
 // marks: searched words to highlight in the title and summary
 const props = defineProps<{ story: Story; lead?: boolean; marks?: string[] }>()
@@ -37,8 +38,11 @@ const style = computed(() => categoryStyle(props.story.category.slug))
           {{ story.title }}
         </h2>
         <p class="mt-4 text-zinc-600 dark:text-zinc-400">{{ story.summary }}</p>
-        <p class="mt-6 text-xs text-zinc-500">
-          {{ formatDate(story.published_at) }} · {{ plural(story.source_count, 'source') }}
+        <p class="mt-6 flex items-center gap-3 text-xs text-zinc-500">
+          <span
+            >{{ formatDate(story.published_at) }} · {{ plural(story.source_count, 'source') }}</span
+          >
+          <ViewCount :views="story.views" />
         </p>
       </div>
     </RouterLink>
@@ -68,7 +72,10 @@ const style = computed(() => categoryStyle(props.story.category.slug))
             style.label
           }}</span>
           <span>{{ formatDate(story.published_at) }}</span>
-          <span class="ml-auto">{{ plural(story.source_count, 'source') }}</span>
+          <ViewCount :views="story.views" class="ml-auto" />
+          <span :class="story.views < VIEWS_SHOWN_FROM && 'ml-auto'">{{
+            plural(story.source_count, 'source')
+          }}</span>
         </div>
       </div>
     </RouterLink>
