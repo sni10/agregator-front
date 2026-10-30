@@ -44,7 +44,7 @@ usePageMeta(() => {
       <h1 class="mt-1 text-3xl font-black tracking-tight md:text-4xl">{{ data.tag.name }}</h1>
       <p class="mt-2 text-sm text-zinc-500">{{ plural(data.tag.count, 'story') }}</p>
     </header>
-    <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <section class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <StoryTile v-for="story in data.feed.results" :key="story.slug" :story="story" />
     </section>
     <PageLinks :page="page" :count="data.feed.count" />

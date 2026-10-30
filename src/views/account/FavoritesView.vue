@@ -44,7 +44,7 @@ onMounted(async () => {
     No favorites yet. Tap ♥ on a story to keep it here.
   </p>
   <template v-else>
-    <section class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <section class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <StoryTile v-for="story in data.results" :key="story.slug" :story="story" />
     </section>
     <PageLinks :page="page" :count="data.count" />

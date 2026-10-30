@@ -75,7 +75,7 @@ usePageMeta(() => {
     This story is unavailable right now. Try again in a minute.
   </p>
 
-  <div v-else-if="story" class="grid gap-10 lg:grid-cols-[1fr_18rem]">
+  <div v-else-if="story" class="grid grid-cols-1 gap-10 lg:grid-cols-[1fr_18rem]">
     <article class="min-w-0">
       <RouterLink :to="`/${category}`" class="text-sm text-zinc-500 hover:underline"
         >← {{ style.label }}</RouterLink

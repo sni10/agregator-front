@@ -20,7 +20,7 @@ const style = computed(() => categoryStyle(props.story.category.slug))
     <RouterLink
       v-if="lead"
       :to="`/news/${story.slug}`"
-      class="group grid overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
+      class="group grid grid-cols-1 overflow-hidden rounded-3xl border border-zinc-200 bg-white shadow-sm md:grid-cols-2 dark:border-zinc-800 dark:bg-zinc-900"
     >
       <StoryCover
         :category="story.category.slug"

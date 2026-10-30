@@ -86,7 +86,9 @@ const LEGAL = [
     </main>
 
     <footer class="border-t border-zinc-200 text-sm dark:border-zinc-800">
-      <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-[2fr_1fr_1fr_1fr]">
+      <div
+        class="mx-auto grid max-w-7xl grid-cols-1 gap-8 px-4 py-10 sm:grid-cols-[2fr_1fr_1fr_1fr]"
+      >
         <div>
           <RouterLink to="/" class="text-lg font-black tracking-tight">
             {{ SITE.name }}<span class="text-violet-500">.</span>

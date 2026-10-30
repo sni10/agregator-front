@@ -120,7 +120,7 @@ usePageMeta(() => ({ title: query.q ? `Search: ${query.q}` : 'Search', noindex: 
         Search without the filters
       </button>
     </div>
-    <section class="mt-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <section class="mt-6 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <StoryTile
         v-for="story in data.results"
         :key="story.slug"

@@ -26,7 +26,7 @@ usePageMeta(() => ({}))
   </p>
 
   <template v-else-if="data">
-    <section class="mb-12 grid gap-6 lg:grid-cols-[2fr_1fr]" aria-label="Top stories">
+    <section class="mb-12 grid grid-cols-1 gap-6 lg:grid-cols-[2fr_1fr]" aria-label="Top stories">
       <StoryTile :story="data.lead[0]!" lead />
       <div
         v-if="data.lead.length > 1"
@@ -36,7 +36,7 @@ usePageMeta(() => ({}))
       </div>
     </section>
 
-    <div class="grid gap-12 lg:grid-cols-[1fr_20rem]">
+    <div class="grid grid-cols-1 gap-12 lg:grid-cols-[1fr_20rem]">
       <div class="min-w-0 space-y-12">
         <section v-if="data.latest.length" aria-labelledby="latest">
           <div
@@ -49,7 +49,7 @@ usePageMeta(() => ({}))
               >All news →</RouterLink
             >
           </div>
-          <div class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             <StoryTile v-for="story in data.latest" :key="story.slug" :story="story" />
           </div>
         </section>
@@ -76,7 +76,7 @@ usePageMeta(() => ({}))
             >
           </div>
           <!-- a big card and a list, then a grid, in turn: the page doesn't read as one long grid -->
-          <div v-if="i % 2 === 0" class="grid gap-6 md:grid-cols-[3fr_2fr]">
+          <div v-if="i % 2 === 0" class="grid grid-cols-1 gap-6 md:grid-cols-[3fr_2fr]">
             <StoryTile :story="section.stories[0]!" large />
             <div class="divide-y divide-zinc-200 dark:divide-zinc-800">
               <StoryRow
@@ -87,7 +87,7 @@ usePageMeta(() => ({}))
               />
             </div>
           </div>
-          <div v-else class="grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+          <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-3">
             <StoryTile v-for="story in section.stories" :key="story.slug" :story="story" />
           </div>
         </section>
