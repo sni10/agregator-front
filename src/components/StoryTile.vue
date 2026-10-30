@@ -1,14 +1,16 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import type { Story } from '@/api'
-import { VIEWS_SHOWN_FROM, categoryStyle, formatDate, plural } from '@/site'
+import { categoryStyle, sourcesLabel } from '@/site'
 import StoryCover from './StoryCover.vue'
 import FavoriteButton from './FavoriteButton.vue'
 import MarkedText from './MarkedText.vue'
+import TimeAgo from './TimeAgo.vue'
 import ViewCount from './ViewCount.vue'
 
+// lead: the top story, photo beside the text; large: the first card of a block, a bigger photo and title.
 // marks: searched words to highlight in the title and summary
-const props = defineProps<{ story: Story; lead?: boolean; marks?: string[] }>()
+const props = defineProps<{ story: Story; lead?: boolean; large?: boolean; marks?: string[] }>()
 const style = computed(() => categoryStyle(props.story.category.slug))
 </script>
 
@@ -38,10 +40,12 @@ const style = computed(() => categoryStyle(props.story.category.slug))
           {{ story.title }}
         </h2>
         <p class="mt-4 text-zinc-600 dark:text-zinc-400">{{ story.summary }}</p>
-        <p class="mt-6 flex items-center gap-3 text-xs text-zinc-500">
-          <span
-            >{{ formatDate(story.published_at) }} · {{ plural(story.source_count, 'source') }}</span
-          >
+        <p class="mt-6 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-500">
+          <span class="rounded-full px-2 py-0.5 font-medium" :class="style.badge">{{
+            style.label
+          }}</span>
+          <TimeAgo :iso="story.published_at" />
+          <span>{{ sourcesLabel(story) }}</span>
           <ViewCount :views="story.views" />
         </p>
       </div>
@@ -55,26 +59,27 @@ const style = computed(() => categoryStyle(props.story.category.slug))
       <StoryCover
         :category="story.category.slug"
         :image="story.image"
-        sizes="(min-width: 768px) 33vw, 100vw"
-        class="h-36"
+        :sizes="large ? '(min-width: 768px) 50vw, 100vw' : '(min-width: 768px) 33vw, 100vw'"
+        :class="large ? 'h-56' : 'h-36'"
       />
       <div class="flex flex-1 flex-col p-5">
         <h3
-          class="text-lg leading-snug font-bold group-hover:text-violet-700 dark:group-hover:text-violet-300"
+          class="leading-snug font-bold group-hover:text-violet-700 dark:group-hover:text-violet-300"
+          :class="large ? 'text-2xl tracking-tight' : 'text-lg'"
         >
           <MarkedText :text="story.title" :terms="marks" />
         </h3>
         <p class="mt-2 line-clamp-3 text-sm text-zinc-600 dark:text-zinc-400">
           <MarkedText :text="story.summary" :terms="marks" />
         </p>
-        <div class="mt-auto flex items-center gap-2 pt-4 text-xs text-zinc-500">
+        <div class="mt-auto flex items-center gap-2 pt-4 text-xs whitespace-nowrap text-zinc-500">
           <span class="rounded-full px-2 py-0.5 font-medium" :class="style.badge">{{
             style.label
           }}</span>
-          <span>{{ formatDate(story.published_at) }}</span>
-          <ViewCount :views="story.views" class="ml-auto" />
-          <span :class="story.views < VIEWS_SHOWN_FROM && 'ml-auto'">{{
-            plural(story.source_count, 'source')
+          <TimeAgo :iso="story.published_at" />
+          <ViewCount :views="story.views" />
+          <span class="ml-auto truncate" :title="story.publishers?.join(', ')">{{
+            sourcesLabel(story)
           }}</span>
         </div>
       </div>

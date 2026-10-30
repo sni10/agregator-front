@@ -26,6 +26,7 @@ export interface Story {
   event_at: string | null // when it happened (earliest source)
   published_at: string
   source_count: number
+  publishers: string[] // who wrote the sources, each once
   views: number // readers who opened it; the front shows it only from VIEWS_SHOWN_FROM
   image: Image | null // null: the category gradient stands in
 }
@@ -39,6 +40,19 @@ export interface Tag {
 export interface TagPage extends Tag {
   count: number // published stories
   indexed: boolean // enough stories for search engines: noindex otherwise
+}
+
+// a subject of the moment: `count` stories in the last week
+export interface TrendingTag extends Tag {
+  count: number
+}
+
+// The front page in one request; a story shows up in one place only
+export interface Home {
+  lead: Story[] // the top story (most sources among the newest), then the ones beside it
+  latest: Story[]
+  sections: { category: Category; stories: Story[] }[] // a block per category
+  most_read: Story[] // of the last days; empty while nobody reads
 }
 
 export interface StoryLink {
@@ -122,6 +136,10 @@ async function get<T>(path: string, query: Record<string, string | number | unde
 
 export const getFeed = (category: string, page: number, tag?: string) =>
   get<Page<Story>>('/publications', { category, tag, page: page > 1 ? page : undefined })
+
+export const getHome = () => get<Home>('/home')
+
+export const getTrendingTags = () => get<TrendingTag[]>('/tags')
 
 export const getTag = (slug: string) => get<TagPage>(`/tags/${encodeURIComponent(slug)}`)
 

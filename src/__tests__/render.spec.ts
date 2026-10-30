@@ -1,7 +1,7 @@
 // @vitest-environment node
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { render } from '../entry-server'
-import type { Image, Page, Story, StoryDetail } from '../api'
+import type { Home, Image, Page, Story, StoryDetail } from '../api'
 
 const story: Story = {
   slug: 'php-patches',
@@ -12,6 +12,7 @@ const story: Story = {
   event_at: null,
   published_at: '2026-10-21T14:00:00Z',
   source_count: 2,
+  publishers: ['LWN', 'The Register'],
   views: 0,
   image: null,
 }
@@ -40,6 +41,18 @@ const detail: StoryDetail = {
   updated_at: '2026-10-21T15:00:00Z',
 }
 const feed: Page<Story> = { count: 1, next: null, previous: null, results: [story] }
+const crypto: Story = {
+  ...story,
+  slug: 'etf-outflows',
+  category: { slug: 'crypto', name: 'Crypto' },
+  title: 'Bitcoin ETFs see outflows',
+}
+const home: Home = {
+  lead: [story, { ...story, slug: 'second', title: 'Second story' }],
+  latest: [{ ...story, slug: 'third', title: 'Third story' }],
+  sections: [{ category: crypto.category, stories: [crypto] }],
+  most_read: [{ ...story, slug: 'popular', title: 'Popular story', views: 120 }],
+}
 
 // the read API, by path
 function api(routes: Record<string, unknown>) {
@@ -57,16 +70,44 @@ function api(routes: Record<string, unknown>) {
 describe('server render', () => {
   afterEach(() => vi.unstubAllGlobals())
 
-  it('renders the feed with the newest story leading', async () => {
-    api({ '/publications': feed })
+  it('renders the front page in blocks: top story, latest, a block per category, most read', async () => {
+    api({ '/home': home, '/tags': [{ slug: 'php', name: 'PHP', count: 4 }] })
 
     const page = await render('/', 'https://site.test')
 
     expect(page.status).toBe(200)
     expect(page.html).toContain('Top story')
-    expect(page.html).toContain('PHP releases emergency patches')
+    for (const title of ['PHP releases emergency patches', 'Second story', 'Third story'])
+      expect(page.html).toContain(title)
+    expect(page.html).toContain('Bitcoin ETFs see outflows')
+    expect(page.html).toContain('href="/crypto"')
+    expect(page.html).toContain('Most read')
+    expect(page.html).toContain('LWN, The Register') // the publishers, not "2 sources"
+    expect(page.html).toContain('href="/tag/php"') // the trending row
+    expect(page.html).toContain('href="/latest"')
     expect(page.head).toContain('<link rel="canonical" href="https://site.test/">')
-    expect(page.state).toContain('feed::1') // the client reuses it instead of loading again
+    expect(page.state).toContain('"home"') // the client reuses it instead of loading again
+  })
+
+  it('renders the whole feed on /latest; old front page pages go there', async () => {
+    api({ '/publications': feed })
+
+    const page = await render('/latest', 'https://site.test')
+    expect(page.html).toContain('PHP releases emergency patches')
+    expect(page.head).toContain('<title>Latest news · Renews</title>')
+    expect(page.state).toContain('feed::1')
+
+    const old = await render('/?page=2', 'https://site.test')
+    expect(old.head).toContain('<link rel="canonical" href="https://site.test/latest?page=2">')
+  })
+
+  it('renders the front page without the topics row when the API has none', async () => {
+    api({ '/home': home })
+
+    const page = await render('/', 'https://site.test')
+
+    expect(page.status).toBe(200) // the row is optional: its 404 is not the page's
+    expect(page.html).not.toContain('Trending')
   })
 
   it('renders a story with its text, sources, follow-ups and NewsArticle data', async () => {
@@ -153,7 +194,7 @@ describe('server render', () => {
     const tile = { ...story, slug: 'other', image }
     api({ '/publications': { ...feed, count: 2, results: [{ ...story, image }, tile] } })
 
-    const page = await render('/', 'https://site.test')
+    const page = await render('/latest', 'https://site.test')
 
     expect(page.html.match(/<img[^>]+fetchpriority="high"/g)).toHaveLength(1)
     expect(page.html.match(/<img[^>]+loading="lazy"/g)).toHaveLength(1)

@@ -4,7 +4,8 @@ import { useSsrState } from '@/ssr'
 
 // Data for a page: loaded during server render and reused on hydration, or loaded in the browser after
 // client-side navigation. The page's key must not change while it lives (App.vue keys views by URL).
-export function useLoad<T>(key: string, load: () => Promise<T>) {
+// optional: a side part of the page (e.g. the topics row): its failure leaves the page's status alone.
+export function useLoad<T>(key: string, load: () => Promise<T>, { optional = false } = {}) {
   const ssr = import.meta.env.SSR ? useSSRContext<{ status?: number }>() : undefined
   const data = useSsrState<T | null>(key, () => null)
   const missing = ref(false) // the API said 404
@@ -18,7 +19,7 @@ export function useLoad<T>(key: string, load: () => Promise<T>) {
       missing.value = e instanceof ApiError && e.status === 404
       failed.value = !missing.value
       // real status codes for crawlers; the server does not cache an error page
-      if (ssr) ssr.status = missing.value ? 404 : 503
+      if (ssr && !optional) ssr.status = missing.value ? 404 : 503
     }
   }
   onServerPrefetch(run)

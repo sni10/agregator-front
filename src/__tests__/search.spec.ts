@@ -122,6 +122,7 @@ describe('search page', () => {
     event_at: null,
     published_at: '2026-10-21T14:00:00Z',
     source_count: 3,
+    publishers: [],
     views: 0,
   }
 

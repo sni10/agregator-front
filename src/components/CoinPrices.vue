@@ -3,8 +3,9 @@ import { computed, onMounted, ref } from 'vue'
 import { getPrices, type Price } from '@/api'
 
 // Live coin prices: the coins a story names (`ids`), or the top ones (`limit`) on the Crypto page.
-// Browser only: a price in the server render would be as old as the page cache. Nothing on failure.
-const props = defineProps<{ ids?: string[]; limit?: number }>()
+// Browser only: a price in the server render would be as old as the page cache. Nothing on failure,
+// the heading included.
+const props = defineProps<{ ids?: string[]; limit?: number; heading?: string }>()
 
 const all = ref<Price[] | null>(null)
 onMounted(async () => {
@@ -48,6 +49,12 @@ export function loadPrices() {
     aria-label="Coin prices"
     class="flex flex-wrap items-center gap-2 text-xs"
   >
+    <h2
+      v-if="heading"
+      class="mb-2 w-full border-b border-zinc-200 pb-2 text-xl font-black tracking-tight dark:border-zinc-800"
+    >
+      {{ heading }}
+    </h2>
     <span
       v-for="coin in shown"
       :key="coin.id"

@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ViewCount from '@/components/ViewCount.vue'
 import { countView } from '@/api'
-import { compact } from '@/site'
+import { compact, sourcesLabel, timeAgo } from '@/site'
 
 describe('view count', () => {
   afterEach(() => vi.unstubAllGlobals())
@@ -24,5 +24,21 @@ describe('view count', () => {
       method: 'POST',
       keepalive: true,
     })
+  })
+})
+
+describe('card meta', () => {
+  it('says how long ago, then the date', () => {
+    const now = Date.parse('2026-10-30T12:00:00Z')
+    expect(timeAgo('2026-10-30T11:59:40Z', now)).toBe('just now')
+    expect(timeAgo('2026-10-30T11:35:00Z', now)).toBe('25 min ago')
+    expect(timeAgo('2026-10-30T02:00:00Z', now)).toBe('10 h ago')
+    expect(timeAgo('2026-10-28T09:05:00Z', now)).toMatch(/^Oct 28, 09:05 AM UTC$/)
+  })
+
+  it('names the publishers, the count when there are none', () => {
+    expect(sourcesLabel({ publishers: ['LWN'], source_count: 1 })).toBe('LWN')
+    expect(sourcesLabel({ publishers: ['A', 'B', 'C', 'D'], source_count: 5 })).toBe('A, B +2')
+    expect(sourcesLabel({ publishers: [], source_count: 3 })).toBe('3 sources')
   })
 })

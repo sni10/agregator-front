@@ -1,14 +1,22 @@
 <script setup lang="ts">
-import { NAV, SITE } from '@/site'
+import { NAV, SITE, today } from '@/site'
 import { consentOpen } from '@/consent'
 import CookieBanner from '@/components/CookieBanner.vue'
 import AuthDialog from '@/components/AuthDialog.vue'
 import UserMenu from '@/components/UserMenu.vue'
 import SearchBox from '@/components/SearchBox.vue'
+import CoinPrices from '@/components/CoinPrices.vue'
+import TrendingTags from '@/components/TrendingTags.vue'
 
-const LEGAL = [
+const SECTIONS = [
+  { to: '/latest', label: 'All news' },
+  ...NAV.filter((item) => item.slug).map((item) => ({ to: `/${item.slug}`, label: item.label })),
+]
+const ABOUT = [
   { to: '/about', label: 'About' },
   { to: '/contact', label: 'Contact' },
+]
+const LEGAL = [
   { to: '/privacy', label: 'Privacy' },
   { to: '/cookies', label: 'Cookies' },
   { to: '/terms', label: 'Terms' },
@@ -23,7 +31,14 @@ const LEGAL = [
     <header
       class="sticky top-0 z-10 border-b border-zinc-200 bg-white/80 backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/80"
     >
-      <div class="mx-auto flex max-w-6xl items-center gap-4 px-4 py-3 sm:gap-6">
+      <!-- the date and the markets: a news front page, not a blog -->
+      <div
+        class="mx-auto hidden max-w-7xl items-center gap-6 border-b border-zinc-100 px-4 py-1.5 text-xs text-zinc-500 md:flex dark:border-zinc-900"
+      >
+        <span class="shrink-0">{{ today() }}</span>
+        <div class="ml-auto hidden lg:block"><CoinPrices :limit="5" /></div>
+      </div>
+      <div class="mx-auto flex max-w-7xl items-center gap-4 px-4 py-3 sm:gap-6">
         <RouterLink to="/" class="text-lg font-black tracking-tight">
           {{ SITE.name }}<span class="text-violet-500">.</span>
         </RouterLink>
@@ -61,35 +76,74 @@ const LEGAL = [
         </RouterLink>
         <UserMenu />
       </div>
+      <!-- account pages: nothing loaded on the server for them -->
+      <TrendingTags v-if="!$route.meta.private" class="mx-auto max-w-7xl px-4 pb-2" />
     </header>
 
-    <main class="mx-auto w-full max-w-6xl flex-1 px-4 py-8">
+    <main class="mx-auto w-full max-w-7xl flex-1 px-4 py-8">
       <!-- keyed by URL: every page loads its own data once (useLoad) -->
       <RouterView :key="$route.fullPath" />
     </main>
 
-    <footer
-      class="border-t border-zinc-200 py-6 text-center text-xs text-zinc-500 dark:border-zinc-800"
-    >
-      <nav class="flex flex-wrap justify-center gap-x-4 gap-y-2 px-4" aria-label="Site">
-        <RouterLink
-          v-for="link in LEGAL"
-          :key="link.to"
-          :to="link.to"
-          class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
-          >{{ link.label }}</RouterLink
-        >
-        <button
-          type="button"
-          class="underline hover:text-zinc-700 dark:hover:text-zinc-300"
-          @click="consentOpen = true"
-        >
-          Cookie settings
-        </button>
-        <!-- served next to the app, not one of its routes -->
-        <a href="/rss.xml" class="underline hover:text-zinc-700 dark:hover:text-zinc-300">RSS</a>
-      </nav>
-      <p class="mt-3">© {{ new Date().getFullYear() }} {{ SITE.name }}</p>
+    <footer class="border-t border-zinc-200 text-sm dark:border-zinc-800">
+      <div class="mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:grid-cols-[2fr_1fr_1fr_1fr]">
+        <div>
+          <RouterLink to="/" class="text-lg font-black tracking-tight">
+            {{ SITE.name }}<span class="text-violet-500">.</span>
+          </RouterLink>
+          <p class="mt-2 max-w-xs text-zinc-500">
+            IT, AI and crypto news from several sources at once.
+          </p>
+        </div>
+        <nav aria-label="Sections">
+          <h2 class="text-xs font-bold tracking-wider text-zinc-400 uppercase">Sections</h2>
+          <ul class="mt-3 space-y-2">
+            <li v-for="link in SECTIONS" :key="link.to">
+              <RouterLink :to="link.to" class="text-zinc-600 hover:underline dark:text-zinc-400">{{
+                link.label
+              }}</RouterLink>
+            </li>
+          </ul>
+        </nav>
+        <nav aria-label="Renews">
+          <h2 class="text-xs font-bold tracking-wider text-zinc-400 uppercase">{{ SITE.name }}</h2>
+          <ul class="mt-3 space-y-2">
+            <li v-for="link in ABOUT" :key="link.to">
+              <RouterLink :to="link.to" class="text-zinc-600 hover:underline dark:text-zinc-400">{{
+                link.label
+              }}</RouterLink>
+            </li>
+            <!-- served next to the app, not one of its routes -->
+            <li>
+              <a href="/rss.xml" class="text-zinc-600 hover:underline dark:text-zinc-400">RSS</a>
+            </li>
+          </ul>
+        </nav>
+        <nav aria-label="Legal">
+          <h2 class="text-xs font-bold tracking-wider text-zinc-400 uppercase">Legal</h2>
+          <ul class="mt-3 space-y-2">
+            <li v-for="link in LEGAL" :key="link.to">
+              <RouterLink :to="link.to" class="text-zinc-600 hover:underline dark:text-zinc-400">{{
+                link.label
+              }}</RouterLink>
+            </li>
+            <li>
+              <button
+                type="button"
+                class="text-zinc-600 hover:underline dark:text-zinc-400"
+                @click="consentOpen = true"
+              >
+                Cookie settings
+              </button>
+            </li>
+          </ul>
+        </nav>
+      </div>
+      <p
+        class="border-t border-zinc-200 py-4 text-center text-xs text-zinc-500 dark:border-zinc-800"
+      >
+        © {{ new Date().getFullYear() }} {{ SITE.name }}
+      </p>
     </footer>
     <CookieBanner />
     <AuthDialog />

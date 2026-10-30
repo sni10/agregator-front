@@ -5,21 +5,31 @@ import { useLoad } from '@/composables/useLoad'
 import { usePageMeta } from '@/composables/usePageMeta'
 import { SOURCE_REL, SITE, categoryStyle, formatDate, plural } from '@/site'
 import StoryCover from '@/components/StoryCover.vue'
+import StoryRow from '@/components/StoryRow.vue'
 import FavoriteButton from '@/components/FavoriteButton.vue'
 import CoinPrices from '@/components/CoinPrices.vue'
+import TimeAgo from '@/components/TimeAgo.vue'
 import ViewCount from '@/components/ViewCount.vue'
 import NotFoundView from './NotFoundView.vue'
 
 const props = defineProps<{ slug: string }>()
-// the story and "More in <category>": the newest others of its category (none if the feed fails)
+// the story, "More on <its first tag>" and "More in <category>": the newest others, each story in one
+// list only (none if a feed fails)
 const { data, missing, failed } = useLoad(`story:${props.slug}`, async () => {
   const story = await getStory(props.slug)
-  const feed = await getFeed(story.category.slug, 1).catch(() => null)
-  const more = feed?.results.filter((s) => s.slug !== props.slug).slice(0, 3) ?? []
-  return { story, more }
+  const tag = story.tags?.[0]
+  const [byCategory, byTag] = await Promise.all([
+    getFeed(story.category.slug, 1).catch(() => null),
+    tag ? getFeed('', 1, tag.slug).catch(() => null) : null,
+  ])
+  const onTag = byTag?.results.filter((s) => s.slug !== props.slug).slice(0, 3) ?? []
+  const shown = new Set([props.slug, ...onTag.map((s) => s.slug)])
+  const more = byCategory?.results.filter((s) => !shown.has(s.slug)).slice(0, 3) ?? []
+  return { story, more, tag: onTag.length ? { tag: tag!, stories: onTag } : null }
 })
 const story = computed(() => data.value?.story)
 const more = computed(() => data.value?.more)
+const onTag = computed(() => data.value?.tag)
 const category = computed(() => story.value?.category.slug ?? '')
 const style = computed(() => categoryStyle(category.value))
 
@@ -82,7 +92,7 @@ usePageMeta(() => {
         <span class="rounded-full px-2.5 py-0.5 text-xs font-semibold" :class="style.badge">{{
           style.label
         }}</span>
-        <time :datetime="story.published_at">{{ formatDate(story.published_at) }}</time>
+        <TimeAgo :iso="story.published_at" />
         <span>·</span>
         <span>{{ plural(story.source_count, 'source') }}</span>
         <ViewCount :views="story.views" />
@@ -201,23 +211,28 @@ usePageMeta(() => {
       </section>
     </article>
 
-    <aside v-if="more?.length" class="lg:pt-10">
-      <h2 class="text-sm font-bold tracking-wider text-zinc-500 uppercase">
-        More in {{ style.label }}
-      </h2>
-      <div class="mt-4 space-y-4">
-        <RouterLink
-          v-for="other in more"
-          :key="other.slug"
-          :to="`/news/${other.slug}`"
-          class="block rounded-xl border border-zinc-200 bg-white p-4 transition hover:shadow-md dark:border-zinc-800 dark:bg-zinc-900"
-        >
-          <h3 class="leading-snug font-bold">{{ other.title }}</h3>
-          <p class="mt-1 text-xs text-zinc-500">
-            {{ formatDate(other.published_at) }} · {{ plural(other.source_count, 'source') }}
-          </p>
-        </RouterLink>
-      </div>
+    <aside v-if="more?.length || onTag" class="space-y-10 lg:pt-10">
+      <section v-if="onTag">
+        <h2 class="text-sm font-bold tracking-wider text-zinc-500 uppercase">
+          More on
+          <RouterLink
+            :to="`/tag/${onTag.tag.slug}`"
+            class="text-violet-600 hover:underline dark:text-violet-400"
+            >#&nbsp;{{ onTag.tag.name }}</RouterLink
+          >
+        </h2>
+        <div class="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <StoryRow v-for="other in onTag.stories" :key="other.slug" :story="other" />
+        </div>
+      </section>
+      <section v-if="more?.length">
+        <h2 class="text-sm font-bold tracking-wider text-zinc-500 uppercase">
+          More in {{ style.label }}
+        </h2>
+        <div class="mt-2 divide-y divide-zinc-200 dark:divide-zinc-800">
+          <StoryRow v-for="other in more" :key="other.slug" :story="other" photo />
+        </div>
+      </section>
     </aside>
   </div>
 </template>

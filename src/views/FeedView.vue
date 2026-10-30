@@ -20,9 +20,11 @@ const { data, failed } = useLoad(`feed:${category}:${page}`, () => getFeed(categ
 const lead = computed(() => (page === 1 ? data.value?.results[0] : undefined))
 const rest = computed(() => data.value?.results.slice(lead.value ? 1 : 0) ?? [])
 
+// no category: /latest, every story newest first (the front page is a selection)
 usePageMeta(() => ({
-  title:
-    [label && `${label} news`, page > 1 && `page ${page}`].filter(Boolean).join(', ') || undefined,
+  title: [label ? `${label} news` : 'Latest news', page > 1 && `page ${page}`]
+    .filter(Boolean)
+    .join(', '),
   description: label
     ? `${label} news: each story brings several sources together, every claim checked against them.`
     : undefined,
@@ -40,7 +42,8 @@ usePageMeta(() => ({
   </p>
 
   <template v-else-if="data">
-    <CoinPrices v-if="category === 'crypto'" :limit="8" class="mb-6" />
+    <!-- wide screens have the prices in the header -->
+    <CoinPrices v-if="category === 'crypto'" :limit="8" class="mb-6 lg:hidden" />
     <section v-if="lead" class="mb-10"><StoryTile :story="lead" lead /></section>
     <h2 class="mb-4 text-sm font-bold tracking-wider text-zinc-500 uppercase">
       {{ label ? `Latest in ${label}` : 'Latest' }}
