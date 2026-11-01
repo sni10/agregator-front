@@ -49,7 +49,7 @@ export interface TrendingTag extends Tag {
 
 // The front page in one request; a story shows up in one place only
 export interface Home {
-  lead: Story[] // the top story (set by an editor, else most sources among the newest), then six beside it
+  lead: Story[] // the top story (set by an editor, else most sources among the newest), then five beside it
   latest: Story[]
   sections: { category: Category; stories: Story[] }[] // a block per category
   most_read: Story[] // of the last days; empty while nobody reads
