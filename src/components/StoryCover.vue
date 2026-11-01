@@ -12,6 +12,18 @@ const props = defineProps<{
   priority?: boolean // above the fold: load at once, not lazily
 }>()
 const style = computed(() => categoryStyle(props.category))
+
+// The browser picks from srcset; src is only the fallback (old browsers, SEO checkers that read src alone), so a mid
+// size, not the 1200 px one the API gives for og:image.
+const FALLBACK_WIDTH = 600
+const fallback = computed(() => {
+  const variants = (props.image?.srcset ?? '')
+    .split(',')
+    .map((entry) => entry.trim().split(/\s+/))
+    .map(([url, width]) => ({ url: url ?? '', width: parseInt(width ?? '', 10) }))
+    .filter((v) => v.url && v.width <= FALLBACK_WIDTH)
+  return variants.length ? variants.reduce((a, b) => (b.width > a.width ? b : a)).url : props.image?.src
+})
 </script>
 
 <template>
@@ -27,7 +39,7 @@ const style = computed(() => categoryStyle(props.category))
       :fetchpriority="priority ? 'high' : undefined"
       :srcset="image.srcset"
       :sizes="sizes ?? '100vw'"
-      :src="image.src"
+      :src="fallback"
       :width="image.width"
       :height="image.height"
       alt=""

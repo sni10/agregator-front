@@ -171,6 +171,8 @@ describe('server render', () => {
     const page = await render('/news/php-patches', 'https://site.test')
 
     expect(page.html).toMatch(/<img[^>]+srcset="https:\/\/cdn.test\/p-320.webp 320w,/)
+    // the fallback src is the largest variant up to 600 px; the 1200 px one stays for og:image
+    expect(page.html).toMatch(/<img[^>]+src="https:\/\/cdn.test\/p-320.webp"/)
     expect(page.html).toContain('fetchpriority="high"')
     expect(page.html).toContain('href="https://pixabay.com/users/geralt-9301/"')
     expect(page.html).toMatch(/rel="nofollow noopener" target="_blank"[^>]*>geralt<\/a>/)
