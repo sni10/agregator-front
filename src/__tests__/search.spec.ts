@@ -126,6 +126,7 @@ describe('search page', () => {
     source_count: 3,
     publishers: [],
     views: 0,
+    rating: 0,
   }
 
   it('sends the filters, marks the words and changes a filter through the URL', async () => {

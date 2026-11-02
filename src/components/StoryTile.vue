@@ -7,6 +7,7 @@ import FavoriteButton from './FavoriteButton.vue'
 import MarkedText from './MarkedText.vue'
 import TimeAgo from './TimeAgo.vue'
 import ViewCount from './ViewCount.vue'
+import RatingCount from './RatingCount.vue'
 
 // lead: the top story, photo beside the text; large: the first card of a block, a bigger photo and title.
 // marks: searched words to highlight in the title and summary
@@ -47,6 +48,7 @@ const style = computed(() => categoryStyle(props.story.category.slug))
           <TimeAgo :iso="story.published_at" />
           <span>{{ sourcesLabel(story) }}</span>
           <ViewCount :views="story.views" />
+          <RatingCount :rating="story.rating" />
         </p>
       </div>
     </RouterLink>
@@ -78,6 +80,7 @@ const style = computed(() => categoryStyle(props.story.category.slug))
           }}</span>
           <TimeAgo :iso="story.published_at" />
           <ViewCount :views="story.views" />
+          <RatingCount :rating="story.rating" />
           <span class="ml-auto truncate" :title="story.publishers?.join(', ')">{{
             sourcesLabel(story)
           }}</span>

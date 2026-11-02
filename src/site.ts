@@ -98,5 +98,8 @@ export const plural = (n: number, word: string) =>
 export const VIEWS_SHOWN_FROM = 100
 
 // 950, 1.2K, 34K, 1.5M
+// thousands, cut not rounded: 2487 -> 2.4, so a card never shows more than the story has
+export const thousands = (n: number) => (Math.floor(n / 100) / 10).toFixed(1)
+
 export const compact = (n: number) =>
   new Intl.NumberFormat('en', { notation: 'compact', maximumFractionDigits: 1 }).format(n)
