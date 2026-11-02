@@ -14,6 +14,7 @@ const story: Story = {
   source_count: 2,
   publishers: ['LWN', 'The Register'],
   views: 0,
+  rating: 0,
   image: null,
 }
 const image: Image = {
