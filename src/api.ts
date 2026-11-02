@@ -54,6 +54,7 @@ export interface Home {
   latest: Story[]
   sections: { category: Category; stories: Story[] }[] // a block per category
   most_read: Story[] // of the last days; empty while nobody reads
+  top_rated: Story[] // of the last week, by readers' like points; empty while nobody likes
 }
 
 export interface StoryLink {
@@ -163,7 +164,7 @@ export interface SearchQuery {
   category: string // it | ai | crypto
   since: string // day | week | month | year
   sources: number // at least this many
-  sort: string // relevance (default) | newest
+  sort: string // relevance (default; newest without q) | newest | top (readers' like points)
 }
 
 export const search = (query: Partial<SearchQuery>, page: number) =>

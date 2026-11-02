@@ -37,7 +37,7 @@ export function readQuery(query: LocationQuery): SearchQuery {
     category: ['it', 'ai', 'crypto'].includes(text(query.category)) ? text(query.category) : '',
     since: PERIODS.some((p) => p.value === since) ? since : '',
     sources: SOURCES.some((s) => s.value === sources) ? sources : 0,
-    sort: text(query.sort) === 'newest' ? 'newest' : '',
+    sort: ['newest', 'top'].includes(text(query.sort)) ? text(query.sort) : '',
   }
 }
 

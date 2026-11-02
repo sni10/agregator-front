@@ -111,6 +111,19 @@ usePageMeta(() => ({}))
             </li>
           </ol>
         </section>
+        <section v-if="data.top_rated.length" aria-labelledby="top-rated">
+          <h2
+            id="top-rated"
+            class="border-b border-zinc-200 pb-2 text-xl font-black tracking-tight dark:border-zinc-800"
+          >
+            Top rated
+          </h2>
+          <ol class="divide-y divide-zinc-200 dark:divide-zinc-800">
+            <li v-for="(story, i) in data.top_rated" :key="story.slug">
+              <StoryRow :story="story" :rank="i + 1" />
+            </li>
+          </ol>
+        </section>
         <CoinPrices :limit="10" heading="Markets" />
       </aside>
     </div>

@@ -29,7 +29,8 @@ const { data, failed } = useLoad(`search:${JSON.stringify(writeQuery(query))}:${
 function change(patch: Partial<SearchQuery>) {
   router.push({ name: 'search', query: writeQuery({ ...query, ...patch }) })
 }
-const clearFilters = () => change({ category: '', since: '', sources: 0 })
+const clearFilters = () =>
+  change({ category: '', since: '', sources: 0, sort: query.q ? query.sort : '' })
 
 const heading = computed(() => {
   if (!query.q) return filtered ? 'Filtered stories' : 'Search the news'
@@ -75,14 +76,15 @@ usePageMeta(() => ({ title: query.q ? `Search: ${query.q}` : 'Search', noindex: 
       <option v-for="s in SOURCES" :key="s.value" :value="s.value">{{ s.label }}</option>
     </select>
     <select
-      v-if="query.q"
+      v-if="asked"
       :value="query.sort"
       aria-label="Sort"
       class="rounded-full border border-zinc-200 bg-white px-3 py-1 dark:border-zinc-800 dark:bg-zinc-900"
       @change="change({ sort: ($event.target as HTMLSelectElement).value })"
     >
-      <option value="">Best match</option>
-      <option value="newest">Newest first</option>
+      <option value="">{{ query.q ? 'Best match' : 'Newest first' }}</option>
+      <option v-if="query.q" value="newest">Newest first</option>
+      <option value="top">Top rated</option>
     </select>
     <button v-if="filtered" type="button" class="link text-xs" @click="clearFilters">
       Clear filters

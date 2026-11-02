@@ -53,6 +53,7 @@ const home: Home = {
   latest: [{ ...story, slug: 'third', title: 'Third story' }],
   sections: [{ category: crypto.category, stories: [crypto] }],
   most_read: [{ ...story, slug: 'popular', title: 'Popular story', views: 120 }],
+  top_rated: [{ ...story, slug: 'liked', title: 'Liked story' }],
 }
 
 // the read API, by path
@@ -83,6 +84,8 @@ describe('server render', () => {
     expect(page.html).toContain('Bitcoin ETFs see outflows')
     expect(page.html).toContain('href="/crypto"')
     expect(page.html).toContain('Most read')
+    expect(page.html).toContain('Top rated')
+    expect(page.html).toContain('Liked story')
     expect(page.html).toContain('LWN, The Register') // the publishers, not "2 sources"
     expect(page.html).toContain('href="/tag/php"') // the trending row
     expect(page.html).toContain('href="/latest"')
