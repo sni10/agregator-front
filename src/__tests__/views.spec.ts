@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { mount } from '@vue/test-utils'
 import ViewCount from '@/components/ViewCount.vue'
 import { countView } from '@/api'
-import { compact, sourcesLabel, timeAgo } from '@/site'
+import { compact, sourcesLabel, thousands, timeAgo } from '@/site'
 
 describe('view count', () => {
   afterEach(() => vi.unstubAllGlobals())
@@ -14,6 +14,7 @@ describe('view count', () => {
 
   it('formats compactly', () => {
     expect([950, 34_000, 1_500_000].map(compact)).toEqual(['950', '34K', '1.5M'])
+    expect([2487, 800, 1000, 12_999].map(thousands)).toEqual(['2.4', '0.8', '1.0', '12.9'])
   })
 
   it('posts the view and ignores failures', async () => {

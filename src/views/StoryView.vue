@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
-import { countView, getFeed, getStory } from '@/api'
+import { computed, onMounted, ref, watch } from 'vue'
+import { addRating, countView, getFeed, getRating, getStory, type Rating } from '@/api'
 import { useLoad } from '@/composables/useLoad'
 import { usePageMeta } from '@/composables/usePageMeta'
 import { SOURCE_REL, SITE, categoryStyle, formatDate, plural } from '@/site'
@@ -10,6 +10,7 @@ import FavoriteButton from '@/components/FavoriteButton.vue'
 import CoinPrices from '@/components/CoinPrices.vue'
 import TimeAgo from '@/components/TimeAgo.vue'
 import ViewCount from '@/components/ViewCount.vue'
+import LikeHold from '@/components/LikeHold.vue'
 import NotFoundView from './NotFoundView.vue'
 
 const props = defineProps<{ slug: string }>()
@@ -33,11 +34,32 @@ const onTag = computed(() => data.value?.tag)
 const category = computed(() => story.value?.category.slug ?? '')
 const style = computed(() => categoryStyle(category.value))
 
+// The reader's like points come from the browser (the SSR page is cached for everyone); the server keeps the limit
+const mine = ref<Rating | null>(null)
+const readLiked = (slug: string) => {
+  mine.value = null
+  getRating(slug)
+    .then((r) => (mine.value = r))
+    .catch(() => {})
+}
+const saveLiked = (added: number) => {
+  if (added)
+    addRating(props.slug, added)
+      .then((r) => (mine.value = r))
+      .catch(() => {})
+}
+
 // in the browser only, also when the router reuses this page for another story
-onMounted(() => countView(props.slug))
+onMounted(() => {
+  countView(props.slug)
+  readLiked(props.slug)
+})
 watch(
   () => props.slug,
-  (slug) => countView(slug),
+  (slug) => {
+    countView(slug)
+    readLiked(slug)
+  },
 )
 
 usePageMeta(() => {
@@ -211,7 +233,20 @@ usePageMeta(() => {
       </section>
     </article>
 
-    <aside v-if="more?.length || onTag" class="space-y-10 lg:pt-10">
+    <aside class="space-y-10 lg:pt-10">
+      <!-- the stage is 340px wide, the column 18rem: it takes the column's width, sparks clip at the edge -->
+      <section>
+        <h2 class="text-sm font-bold tracking-wider text-zinc-500 uppercase">Rate it!</h2>
+        <p class="mt-1 text-sm text-zinc-500"></p>
+        <div class="like flex justify-center overflow-hidden">
+          <LikeHold
+            :key="story.slug"
+            :rating="(mine?.rating ?? story.rating) - (mine?.given ?? 0)"
+            :initial="mine?.given ?? 0"
+            @commit="saveLiked"
+          />
+        </div>
+      </section>
       <section v-if="onTag">
         <h2 class="text-sm font-bold tracking-wider text-zinc-500 uppercase">
           More on
@@ -238,6 +273,9 @@ usePageMeta(() => {
 </template>
 
 <style scoped>
+.like :deep(.lh-stage) {
+  width: 100%;
+}
 /* links and lists inside the rendered body */
 .story-body :deep(a) {
   color: var(--color-violet-600);

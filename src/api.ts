@@ -28,6 +28,7 @@ export interface Story {
   source_count: number
   publishers: string[] // who wrote the sources, each once
   views: number // readers who opened it; the front shows it only from VIEWS_SHOWN_FROM
+  rating: number // readers' like points, up to 100 from each
   image: Image | null // null: the category gradient stands in
 }
 
@@ -53,6 +54,7 @@ export interface Home {
   latest: Story[]
   sections: { category: Category; stories: Story[] }[] // a block per category
   most_read: Story[] // of the last days; empty while nobody reads
+  top_rated: Story[] // of the last week, by readers' like points; empty while nobody likes
 }
 
 export interface StoryLink {
@@ -162,7 +164,7 @@ export interface SearchQuery {
   category: string // it | ai | crypto
   since: string // day | week | month | year
   sources: number // at least this many
-  sort: string // relevance (default) | newest
+  sort: string // relevance (default; newest without q) | newest | top (readers' like points)
 }
 
 export const search = (query: Partial<SearchQuery>, page: number) =>
@@ -273,6 +275,17 @@ async function request<T>(method: string, path: string, body?: unknown): Promise
 }
 
 const post = <T>(path: string, body: unknown) => request<T>('POST', path, body)
+
+// Like points: up to 100 from each reader per story (a guest is their IP); the server cuts a hold to what is left
+export interface Rating {
+  rating: number // the story's, everyone's points
+  given: number // this reader's
+  left: number
+}
+const ratingPath = (slug: string) => `/publications/${encodeURIComponent(slug)}/rating`
+export const getRating = (slug: string) => request<Rating>('GET', ratingPath(slug))
+export const addRating = (slug: string, points: number) =>
+  post<Rating>(ratingPath(slug), { points })
 
 export const getMe = () => request<Me>('GET', '/me')
 

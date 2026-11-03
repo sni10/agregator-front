@@ -53,6 +53,8 @@ describe('search helpers', () => {
     const query = readQuery({ q: ' etf ', category: 'ai', since: 'forever', sources: '3', x: '1' })
     expect(query).toEqual({ q: 'etf', category: 'ai', since: '', sources: 3, sort: '' })
     expect(writeQuery(query)).toEqual({ q: 'etf', category: 'ai', sources: 3 })
+    expect(readQuery({ sort: 'top' }).sort).toBe('top')
+    expect(readQuery({ sort: 'random' }).sort).toBe('')
   })
 })
 
@@ -124,6 +126,7 @@ describe('search page', () => {
     source_count: 3,
     publishers: [],
     views: 0,
+    rating: 0,
   }
 
   it('sends the filters, marks the words and changes a filter through the URL', async () => {
